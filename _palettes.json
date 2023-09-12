@@ -1,0 +1,120 @@
+{
+    "nextPaletteID": 7,
+    "palettes": {
+        "custom0": {
+            "id": "custom0",
+            "name": "Custom",
+            "colors": [
+                "#000000",
+                "#FFFFFF",
+                "#3B3B3B",
+                "#E3D7F9",
+                "#9B6F95",
+                "#FFF609",
+                "#249CA3",
+                "#B0B0B0",
+                "#003FAD",
+                "#420C55",
+                "#4D2762",
+                "#501647",
+                "#5C406c",
+                "#E5CDC4",
+                "#454545",
+                "#000000"
+            ],
+            "custom": true
+        },
+        "custom1": {
+            "id": "custom1",
+            "name": "Custom",
+            "colors": [
+                "#000000",
+                "#FFFFFF",
+                "#454545",
+                "#C0CADD",
+                "#FF8135",
+                "#FFF609",
+                "#249CA3",
+                "#78DC52",
+                "#003FAD",
+                "#87F2FF",
+                "#8E2EC4",
+                "#A4839F",
+                "#5C406c",
+                "#E5CDC4",
+                "#91463d",
+                "#000000"
+            ],
+            "custom": true
+        },
+        "custom2": {
+            "id": "custom2",
+            "name": "Custom",
+            "colors": [
+                "#000000",
+                "#FFFFFF",
+                "#FF2121",
+                "#E3D7F9",
+                "#FF8135",
+                "#FFF609",
+                "#249CA3",
+                "#78DC52",
+                "#003FAD",
+                "#87F2FF",
+                "#8E2EC4",
+                "#A4839F",
+                "#5C406c",
+                "#E5CDC4",
+                "#91463d",
+                "#000000"
+            ],
+            "custom": true
+        },
+        "custom4": {
+            "id": "custom4",
+            "name": "Grim",
+            "colors": [
+                "#000000",
+                "#FFFFFF",
+                "#3B3B3B",
+                "#E3D7F9",
+                "#9B6F95",
+                "#FFF609",
+                "#784997",
+                "#B0B0B0",
+                "#B40485",
+                "#430F66",
+                "#63387A",
+                "#5B2F6F",
+                "#BDA8DC",
+                "#E5CDC4",
+                "#454545",
+                "#000000"
+            ],
+            "custom": true
+        },
+        "custom6": {
+            "id": "custom6",
+            "name": "Custom",
+            "colors": [
+                "#000000",
+                "#FFFFFF",
+                "#FF2121",
+                "#FF93C4",
+                "#FF8135",
+                "#FFF609",
+                "#8088FF",
+                "#E5ADFF",
+                "#9987D9",
+                "#87F2FF",
+                "#8E2EC4",
+                "#A4839F",
+                "#5C406c",
+                "#C7C7C7",
+                "#91463d",
+                "#000000"
+            ],
+            "custom": true
+        }
+    }
+}
