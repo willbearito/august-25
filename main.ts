@@ -308,11 +308,11 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     controller.moveSprite(mySprite, 50, 0)
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
         slow_jump()
-        mySprite.ay = 100
-        mySprite.vy = -100
+        mySprite.ay = 300
+        mySprite.vy = -150
     } else if (canDoubleJump) {
-        mySprite.ay = 100
-        mySprite.vy = -100
+        mySprite.ay = 300
+        mySprite.vy = -150
         canDoubleJump = false
     }
 })
@@ -617,22 +617,27 @@ tiles.setCurrentTilemap(tilemap`level1`)
 mySprite = sprites.create(assets.image`myImage1`, SpriteKind.Player)
 controller.moveSprite(mySprite, 100, 0)
 Enemy_1_Mele = sprites.create(img`
-    . . . . . . 1 1 . . . . . . . . 
-    1 1 1 . . . 1 1 . . . . 1 1 1 1 
-    1 1 1 1 1 5 f f 5 . . 1 1 1 1 . 
-    . 1 1 1 5 5 5 5 5 5 1 1 1 1 . . 
-    . . . 1 f 5 5 5 5 f 1 . . . . . 
-    . . . . f 5 5 5 5 f f . . . . . 
-    . . . f f 5 5 5 5 f f f . . . . 
-    . . . f f 5 5 5 5 . f f . . . . 
-    . . 5 f . f f f f . . 5 . . . . 
-    . . f . f f f f f f . f . . . . 
-    . . . . f f . f f f . . . . . . 
-    . . . . f f f . f f . . . . . . 
-    . . . . f f f . . f f . . . . . 
-    . . . . . 5 f . . 5 5 . . . . . 
-    . . . . . 5 . . . . 5 . . . . . 
-    . . . . f f . . . . f . . . . . 
+    ......11........
+    111...11....1111
+    111115ff5..1111.
+    .1115555551111..
+    ...1f5555f1.....
+    ....f5555ff.....
+    ...ff5555fff....
+    ...ff5555.ff....
+    ..5f.ffff..5....
+    ..f.ffffff.f....
+    ....ff.fff......
+    ....fff.ff......
+    ....fff..ff.....
+    .....5f..55.....
+    .....5....5.....
+    ....ff....f.....
+    ................
+    ................
+    ................
+    ................
+    ................
     `, SpriteKind.Enemy)
 tiles.placeOnTile(Enemy_1_Mele, tiles.getTileLocation(15, 251))
 Enemy_1_Mele.setScale(1.5, ScaleAnchor.Middle)
@@ -648,6 +653,6 @@ game.onUpdateInterval(100, function () {
         controller.moveSprite(mySprite, 100, 0)
     }
     if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
-        Enemy_1_Mele.follow(mySprite, 100)
+        Enemy_1_Mele.follow(mySprite, 50)
     }
 })
