@@ -8,7 +8,6 @@
         "controller": "*",
         "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.2.1",
         "arcade-tile-util": "github:microsoft/arcade-tile-util#v1.0.1",
-        "pxt-raycasting": "github:aqeeaqee/pxt-raycasting#v0.3.18",
         "arcade-sprite-util": "github:jwunderl/arcade-sprite-util#v0.4.1"
     },
     "files": [
