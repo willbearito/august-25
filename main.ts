@@ -3,6 +3,9 @@ enum ActionKind {
     Idle,
     Jumping
 }
+namespace SpriteKind {
+    export const dash = SpriteKind.create()
+}
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     Facing_up = true
     facing_left = false
@@ -390,6 +393,10 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         canDoubleJump = false
     }
 })
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.dash, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    pause(1000)
+})
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     facing_right = false
     facing_left = true
@@ -503,8 +510,15 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     )
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
-    statusbar.value += -3
-    sprites.destroy(projectile)
+    if (Dashing == false) {
+        statusbar.value += -3
+        sprites.destroy(projectile)
+    }
+    Enemy_1_Mele.follow(mySprite, 50)
+})
+statusbars.onZero(StatusBarKind.Health, function (status) {
+    sprites.destroy(statusbar.spriteAttachedTo())
+    statusbar.spriteAttachedTo().startEffect(effects.fire)
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     facing_right = true
@@ -643,15 +657,49 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    pause(1000)
+})
 function slow_jump () {
 	
 }
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(Dashing)) {
+        Dashing = true
+        previous_speed = mySprite.vx
+        controller.moveSprite(mySprite, 0, 0)
+        if (facing_left == true) {
+            direction = -1
+        } else if (facing_right == true) {
+            direction = 1
+        }
+        mySprite.setVelocity(direction * 400, 0)
+        for (let index = 0; index <= 3; index++) {
+            timer.background(function () {
+                projectile2 = sprites.createProjectileFromSprite(mySprite.image, mySprite, 0 - direction * 5, 0)
+                projectile2.lifespan = 50
+            })
+        }
+        timer.after(100, function () {
+            mySprite.vx = previous_speed
+            controller.moveSprite(mySprite, 150, 0)
+            Dashing = false
+        })
+    }
+})
 function coordinate_values () {
     enemy_y = Enemy_1_Mele.y
     enemy_x = Enemy_1_Mele.x
     Player_x = mySprite.x
     Player_y = mySprite.y
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`transparency16`, function (sprite, location) {
+	
+})
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleRedCrystal, function (sprite, location) {
+	
+})
 function move2 (text: string, num: number) {
     pause(2000)
     mySprite.sayText(text)
@@ -663,6 +711,10 @@ let Player_y = 0
 let Player_x = 0
 let enemy_x = 0
 let enemy_y = 0
+let projectile2: Sprite = null
+let direction = 0
+let previous_speed = 0
+let Dashing = false
 let projectile: Sprite = null
 let facing_right = false
 let facing_left = false
@@ -693,6 +745,7 @@ game.showLongText("You are the reaper of the underworld", DialogLayout.Center)
 canDoubleJump = true
 scene.setBackgroundColor(12)
 tiles.setCurrentTilemap(tilemap`level1`)
+info.setLife(3)
 mySprite = sprites.create(assets.image`myImage1`, SpriteKind.Player)
 controller.moveSprite(mySprite, 150, 0)
 Enemy_1_Mele = sprites.create(img`
