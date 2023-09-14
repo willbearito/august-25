@@ -5,7 +5,15 @@ enum ActionKind {
 }
 namespace SpriteKind {
     export const dash = SpriteKind.create()
+    export const Upgrade = SpriteKind.create()
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile0`, function (sprite, location) {
+    if (take_damage == true) {
+        info.changeLifeBy(-1)
+    }
+    take_damage = false
+    tiles.placeOnTile(mySprite, Respawn_point.getNeighboringLocation(CollisionDirection.Left))
+})
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     Facing_up = true
     facing_left = false
@@ -516,6 +524,28 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
     }
     Enemy_1_Mele.follow(mySprite, 50)
 })
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
+    tileUtil.coverAllTiles(sprites.dungeon.chestClosed, sprites.builtin.forestTiles10)
+    blood_sythe = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . 1 d . . . . . . . . . . 
+        . . . 1 d d d . . . . . . . . . 
+        . . 1 d d d d d . . . . . . . . 
+        . . d d 2 . d f b . . . . . . . 
+        . 1 d 2 . . . c f b . . . . . . 
+        . 1 d 2 . . . . c f b . . . . . 
+        . 1 2 . . . . . . c f b . . . . 
+        . 1 2 . . . . . . . c f b . . . 
+        . 1 2 . . . . . . . . c f b . . 
+        . 1 . . . . . . . . . . c 2 b . 
+        . . . . . . . . . . . . . c c . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.Upgrade)
+    blood_sythe.changeScale(2, ScaleAnchor.Middle)
+})
 statusbars.onZero(StatusBarKind.Health, function (status) {
     sprites.destroy(statusbar.spriteAttachedTo())
     statusbar.spriteAttachedTo().startEffect(effects.fire)
@@ -658,8 +688,10 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     )
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
-    info.changeLifeBy(-1)
-    pause(1000)
+    if (take_damage == true) {
+        info.changeLifeBy(-1)
+        take_damage = false
+    }
 })
 function slow_jump () {
 	
@@ -694,11 +726,8 @@ function coordinate_values () {
     Player_x = mySprite.x
     Player_y = mySprite.y
 }
-scene.onOverlapTile(SpriteKind.Player, assets.tile`transparency16`, function (sprite, location) {
-	
-})
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleRedCrystal, function (sprite, location) {
-	
+    tiles.placeOnTile(mySprite, Respawn_point)
 })
 function move2 (text: string, num: number) {
     pause(2000)
@@ -714,11 +743,14 @@ let enemy_y = 0
 let projectile2: Sprite = null
 let direction = 0
 let previous_speed = 0
+let blood_sythe: Sprite = null
 let Dashing = false
 let projectile: Sprite = null
 let facing_right = false
 let facing_left = false
 let Facing_up = false
+let Respawn_point: tiles.Location = null
+let take_damage = false
 let statusbar: StatusBarSprite = null
 let Enemy_1_Mele: Sprite = null
 let mySprite: Sprite = null
@@ -780,6 +812,12 @@ statusbar = statusbars.create(20, 4, StatusBarKind.Health)
 statusbar.max = 20
 statusbar.attachToSprite(Enemy_1_Mele)
 music.play(music.stringPlayable("C D F D G D - C ", 124), music.PlaybackMode.InBackground)
+game.onUpdate(function () {
+	
+})
+game.onUpdateInterval(1000, function () {
+    take_damage = true
+})
 forever(function () {
 	
 })
@@ -792,5 +830,10 @@ game.onUpdateInterval(100, function () {
     }
     if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
         Enemy_1_Mele.follow(mySprite, 50)
+    }
+})
+game.onUpdateInterval(200, function () {
+    if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
+        Respawn_point = mySprite.tilemapLocation()
     }
 })
