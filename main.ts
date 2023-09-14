@@ -280,6 +280,80 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             `, mySprite, -200, 0)
+        animation.runImageAnimation(
+        projectile,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . a . 3 . . a . . 3 . . . 
+            . . . c c c c . . . . 3 . . a . 
+            . 3 c 1 1 1 1 c c . . . a . . . 
+            . 3 1 1 1 1 1 1 a a c c . . . . 
+            . . 1 1 1 1 1 1 1 1 a a a a . . 
+            . . 1 1 1 1 1 1 1 1 1 1 1 1 . . 
+            . . 1 1 1 1 1 b b a c c a a . . 
+            . . c b b b b a c c . a . . . . 
+            . 3 . c c c c . 3 . . . . . a . 
+            . . . a . 3 . . . a . . 3 . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `,img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . 3 . . . . . . . . . . 
+            . . . . a . . . . . . . . . . . 
+            . . . a . . . . . . 3 . . 3 . . 
+            . . 3 c c c c . . a . . 3 . . . 
+            . . c b b b b c c . . . a . . . 
+            . 3 b 1 1 1 1 b a a c c . . . . 
+            . a 1 1 1 1 1 1 b b a a a a . . 
+            . 3 1 1 1 1 1 1 1 1 1 b b 1 . . 
+            . 3 1 1 1 1 1 1 1 a c c a a . . 
+            . . c 1 1 1 1 a c c . . . . . . 
+            . . 3 c c c c . . . . a . . 3 . 
+            . . . a 3 . 3 . . . . . . . . . 
+            . . . . a . . 3 . . 3 . . . 3 . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `,img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . a . . . . . . . . . . . 
+            . . . a . . . . . . . . . . . . 
+            . . a c c c c . . a . . . . . a 
+            . . c 1 1 b b c c . . . a . a . 
+            . a b 1 1 1 1 b a a c c . . . . 
+            . a 1 1 1 1 1 1 1 b a a a a . . 
+            . a 3 1 3 1 1 3 1 1 1 1 3 b . . 
+            . a 3 1 1 1 1 b b a c 3 a a . . 
+            . . c 1 1 3 b 3 c c . 3 . a a . 
+            . . a c c c c . . . . a . . . . 
+            . . 3 a . . . . 3 . . . . . . . 
+            . . . . 3 . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `,img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . a . . . . . . . . . . 
+            . . . a a b . . . . . . . . . . 
+            . . a a . . . . a . . . . . . . 
+            . a a c c c c . . a . . . . . . 
+            . a b b b b b c c . . . . . . . 
+            . a 1 1 1 1 1 b a a c c . . a . 
+            . a 1 1 1 1 1 1 1 b a a a a . . 
+            . a 1 1 1 1 1 b 1 1 1 1 1 b a . 
+            . a b 1 1 1 1 b b a c c a a . . 
+            . a c b b b b a c c . . . . . . 
+            . . a c c c c . . . . . . . . . 
+            . . a b a . . . . a . . . . . . 
+            . . . . a b . . a . . . . . . . 
+            . . . . a a . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
+        100,
+        true
+        )
         pause(750)
     }
     if (Facing_up == true) {
@@ -303,9 +377,12 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
             `, mySprite, 0, -200)
         pause(750)
     }
+    if (projectile.overlapsWith(Enemy_1_Mele)) {
+    	
+    }
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    controller.moveSprite(mySprite, 50, 0)
+    controller.moveSprite(mySprite, 65, 0)
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
         slow_jump()
         mySprite.ay = 300
@@ -615,7 +692,7 @@ canDoubleJump = true
 scene.setBackgroundColor(12)
 tiles.setCurrentTilemap(tilemap`level1`)
 mySprite = sprites.create(assets.image`myImage1`, SpriteKind.Player)
-controller.moveSprite(mySprite, 100, 0)
+controller.moveSprite(mySprite, 150, 0)
 Enemy_1_Mele = sprites.create(img`
     ......11........
     111...11....1111
@@ -644,13 +721,13 @@ Enemy_1_Mele.setScale(1.5, ScaleAnchor.Middle)
 tiles.placeOnTile(mySprite, tiles.getTileLocation(3, 251))
 scene.cameraFollowSprite(mySprite)
 mySprite.sayText(mySprite.x, 3000, false)
-music.play(music.stringPlayable("C D F D G D - C ", 124), music.PlaybackMode.UntilDone)
+music.play(music.stringPlayable("C D F D G D - C ", 124), music.PlaybackMode.InBackground)
 game.onUpdateInterval(100, function () {
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
         canDoubleJump = true
     }
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
-        controller.moveSprite(mySprite, 100, 0)
+        controller.moveSprite(mySprite, 150, 0)
     }
     if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
         Enemy_1_Mele.follow(mySprite, 50)
