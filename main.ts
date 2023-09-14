@@ -377,9 +377,6 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
             `, mySprite, 0, -200)
         pause(750)
     }
-    if (projectile.overlapsWith(Enemy_1_Mele)) {
-    	
-    }
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     controller.moveSprite(mySprite, 65, 0)
@@ -504,6 +501,10 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     250,
     true
     )
+})
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
+    statusbar.value += -3
+    sprites.destroy(projectile)
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     facing_right = true
@@ -666,6 +667,7 @@ let projectile: Sprite = null
 let facing_right = false
 let facing_left = false
 let Facing_up = false
+let statusbar: StatusBarSprite = null
 let Enemy_1_Mele: Sprite = null
 let mySprite: Sprite = null
 let canDoubleJump = false
@@ -721,7 +723,13 @@ Enemy_1_Mele.setScale(1.5, ScaleAnchor.Middle)
 tiles.placeOnTile(mySprite, tiles.getTileLocation(3, 251))
 scene.cameraFollowSprite(mySprite)
 mySprite.sayText(mySprite.x, 3000, false)
+statusbar = statusbars.create(20, 4, StatusBarKind.Health)
+statusbar.max = 20
+statusbar.attachToSprite(Enemy_1_Mele)
 music.play(music.stringPlayable("C D F D G D - C ", 124), music.PlaybackMode.InBackground)
+forever(function () {
+	
+})
 game.onUpdateInterval(100, function () {
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
         canDoubleJump = true
