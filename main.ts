@@ -176,9 +176,6 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
-scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles1, function (sprite, location) {
-    On_a_Safe_block = false
-})
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (facing_right == true) {
         projectile = sprites.createProjectileFromSprite(img`
@@ -391,9 +388,6 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
             `, mySprite, 0, -200)
         pause(750)
     }
-})
-scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles0, function (sprite, location) {
-    On_a_Safe_block = false
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     controller.moveSprite(mySprite, 65, 0)
@@ -742,11 +736,8 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         })
     }
 })
-scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles22, function (sprite, location) {
-    On_a_Safe_block = true
-})
-scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles3, function (sprite, location) {
-    On_a_Safe_block = false
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile5`, function (sprite, location) {
+    Respawn_point = location
 })
 function coordinate_values () {
     enemy_y = Enemy_1_Mele.y
@@ -754,9 +745,6 @@ function coordinate_values () {
     Player_x = mySprite.x
     Player_y = mySprite.y
 }
-scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles23, function (sprite, location) {
-    On_a_Safe_block = false
-})
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleRedCrystal, function (sprite, location) {
     tiles.placeOnTile(mySprite, Respawn_point)
 })
@@ -767,12 +755,6 @@ function move2 (text: string, num: number) {
     mySprite.y += 20
     music.play(music.tonePlayable(262, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
 }
-scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles21, function (sprite, location) {
-    On_a_Safe_block = false
-})
-scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles2, function (sprite, location) {
-    On_a_Safe_block = true
-})
 let Player_y = 0
 let Player_x = 0
 let enemy_x = 0
@@ -789,7 +771,6 @@ let facing_right = false
 let facing_left = false
 let Facing_up = false
 let Respawn_point: tiles.Location = null
-let On_a_Safe_block = false
 let Able_to_open_Chest_1 = false
 let take_damage = false
 let statusbar: StatusBarSprite = null
@@ -855,7 +836,7 @@ statusbar.attachToSprite(Enemy_1_Mele)
 music.play(music.stringPlayable("C D F D G D - C ", 124), music.PlaybackMode.InBackground)
 take_damage = true
 Able_to_open_Chest_1 = true
-On_a_Safe_block = 0
+let On_a_Safe_block = 0
 game.onUpdate(function () {
 	
 })
@@ -866,9 +847,7 @@ forever(function () {
 	
 })
 game.onUpdateInterval(500, function () {
-    if (On_a_Safe_block == true) {
-        Respawn_point = mySprite.tilemapLocation()
-    }
+	
 })
 game.onUpdateInterval(100, function () {
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
