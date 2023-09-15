@@ -176,6 +176,9 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles1, function (sprite, location) {
+    On_a_Safe_block = false
+})
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (facing_right == true) {
         projectile = sprites.createProjectileFromSprite(img`
@@ -389,8 +392,12 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         pause(750)
     }
 })
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles0, function (sprite, location) {
+    On_a_Safe_block = false
+})
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     controller.moveSprite(mySprite, 65, 0)
+    A_Button_Press = true
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
         slow_jump()
         mySprite.ay = 300
@@ -400,6 +407,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         mySprite.vy = -150
         canDoubleJump = false
     }
+    A_Button_Press = false
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.dash, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
@@ -525,26 +533,29 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
     Enemy_1_Mele.follow(mySprite, 50)
 })
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
-    tileUtil.coverAllTiles(sprites.dungeon.chestClosed, sprites.builtin.forestTiles10)
-    blood_sythe = sprites.create(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . 1 d . . . . . . . . . . 
-        . . . 1 d d d . . . . . . . . . 
-        . . 1 d d d d d . . . . . . . . 
-        . . d d 2 . d f b . . . . . . . 
-        . 1 d 2 . . . c f b . . . . . . 
-        . 1 d 2 . . . . c f b . . . . . 
-        . 1 2 . . . . . . c f b . . . . 
-        . 1 2 . . . . . . . c f b . . . 
-        . 1 2 . . . . . . . . c f b . . 
-        . 1 . . . . . . . . . . c 2 b . 
-        . . . . . . . . . . . . . c c . 
-        . . . . . . . . . . . . . . . . 
-        `, SpriteKind.Upgrade)
-    blood_sythe.changeScale(2, ScaleAnchor.Middle)
+    if (Able_to_open_Chest_1 == true) {
+        tileUtil.coverAllTiles(sprites.dungeon.chestClosed, sprites.builtin.forestTiles10)
+        blood_sythe = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . 1 d . . . . . . . . . . 
+            . . . 1 d d d . . . . . . . . . 
+            . . 1 d d d d d . . . . . . . . 
+            . . d d 2 . d f b . . . . . . . 
+            . 1 d 2 . . . c f b . . . . . . 
+            . 1 d 2 . . . . c f b . . . . . 
+            . 1 2 . . . . . . c f b . . . . 
+            . 1 2 . . . . . . . c f b . . . 
+            . 1 2 . . . . . . . . c f b . . 
+            . 1 . . . . . . . . . . c 2 b . 
+            . . . . . . . . . . . . . c c . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.Upgrade)
+        blood_sythe.setPosition(mySprite.x, mySprite.y)
+        Able_to_open_Chest_1 = false
+    }
 })
 statusbars.onZero(StatusBarKind.Health, function (status) {
     sprites.destroy(statusbar.spriteAttachedTo())
@@ -693,6 +704,17 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSp
         take_damage = false
     }
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Upgrade, function (sprite, otherSprite) {
+    otherSprite.changeScale(2, ScaleAnchor.Middle)
+    if (controller.A.isPressed()) {
+        sprites.destroy(otherSprite)
+    }
+    if (otherSprite == blood_sythe) {
+        game.showLongText("The Blood Sythe; you feel the power of poor sould resonate within you. You do 6 damage", DialogLayout.Center)
+        sprites.destroy(blood_sythe)
+        Blood_Sythe_Damage = true
+    }
+})
 function slow_jump () {
 	
 }
@@ -720,12 +742,21 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         })
     }
 })
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles22, function (sprite, location) {
+    On_a_Safe_block = true
+})
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles3, function (sprite, location) {
+    On_a_Safe_block = false
+})
 function coordinate_values () {
     enemy_y = Enemy_1_Mele.y
     enemy_x = Enemy_1_Mele.x
     Player_x = mySprite.x
     Player_y = mySprite.y
 }
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles23, function (sprite, location) {
+    On_a_Safe_block = false
+})
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleRedCrystal, function (sprite, location) {
     tiles.placeOnTile(mySprite, Respawn_point)
 })
@@ -736,6 +767,12 @@ function move2 (text: string, num: number) {
     mySprite.y += 20
     music.play(music.tonePlayable(262, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
 }
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles21, function (sprite, location) {
+    On_a_Safe_block = false
+})
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles2, function (sprite, location) {
+    On_a_Safe_block = true
+})
 let Player_y = 0
 let Player_x = 0
 let enemy_x = 0
@@ -743,13 +780,17 @@ let enemy_y = 0
 let projectile2: Sprite = null
 let direction = 0
 let previous_speed = 0
+let Blood_Sythe_Damage = false
 let blood_sythe: Sprite = null
 let Dashing = false
+let A_Button_Press = false
 let projectile: Sprite = null
 let facing_right = false
 let facing_left = false
 let Facing_up = false
 let Respawn_point: tiles.Location = null
+let On_a_Safe_block = false
+let Able_to_open_Chest_1 = false
 let take_damage = false
 let statusbar: StatusBarSprite = null
 let Enemy_1_Mele: Sprite = null
@@ -777,7 +818,7 @@ game.showLongText("You are the reaper of the underworld", DialogLayout.Center)
 canDoubleJump = true
 scene.setBackgroundColor(12)
 tiles.setCurrentTilemap(tilemap`level1`)
-info.setLife(3)
+info.setLife(100000)
 mySprite = sprites.create(assets.image`myImage1`, SpriteKind.Player)
 controller.moveSprite(mySprite, 150, 0)
 Enemy_1_Mele = sprites.create(img`
@@ -812,6 +853,9 @@ statusbar = statusbars.create(20, 4, StatusBarKind.Health)
 statusbar.max = 20
 statusbar.attachToSprite(Enemy_1_Mele)
 music.play(music.stringPlayable("C D F D G D - C ", 124), music.PlaybackMode.InBackground)
+take_damage = true
+Able_to_open_Chest_1 = true
+On_a_Safe_block = 0
 game.onUpdate(function () {
 	
 })
@@ -820,6 +864,11 @@ game.onUpdateInterval(1000, function () {
 })
 forever(function () {
 	
+})
+game.onUpdateInterval(500, function () {
+    if (On_a_Safe_block == true) {
+        Respawn_point = mySprite.tilemapLocation()
+    }
 })
 game.onUpdateInterval(100, function () {
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
@@ -830,10 +879,5 @@ game.onUpdateInterval(100, function () {
     }
     if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
         Enemy_1_Mele.follow(mySprite, 50)
-    }
-})
-game.onUpdateInterval(200, function () {
-    if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
-        Respawn_point = mySprite.tilemapLocation()
     }
 })
