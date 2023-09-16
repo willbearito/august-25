@@ -1,7 +1,9 @@
 enum ActionKind {
     Walking,
     Idle,
-    Jumping
+    Jumping,
+    Attacking,
+    AttackRight
 }
 namespace SpriteKind {
     export const dash = SpriteKind.create()
@@ -391,6 +393,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
             `, mySprite, 0, -200)
         pause(750)
     }
+    projectile.lifespan = 50
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     controller.moveSprite(mySprite, 65, 0)
@@ -528,14 +531,20 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
     if (Blood_Sythe_Damage == false) {
         if (Dashing == false) {
-            statusbar.value += -3
             sprites.destroy(projectile)
+            if (sprite == Enemy_1_Mele) {
+                statusbar.value += -3
+                sprites.destroy(projectile)
+            }
         }
     }
     if (Blood_Sythe_Damage == true) {
         if (Dashing == false) {
-            statusbar.value += -6
             sprites.destroy(projectile)
+            if (sprite == Enemy_1_Mele) {
+                sprites.destroy(projectile)
+                statusbar.value += -6
+            }
         }
     }
     Enemy_1_Mele.follow(mySprite, 50)
@@ -566,9 +575,13 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sp
     }
 })
 statusbars.onZero(StatusBarKind.Health, function (status) {
-    sprites.destroy(statusbar.spriteAttachedTo())
-    statusbar.spriteAttachedTo().startEffect(effects.fire)
+    sprites.destroy(status.spriteAttachedTo())
+    Create_Enemies()
 })
+function Level_1 () {
+    tiles.setCurrentTilemap(tilemap`level2`)
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(80, 25))
+}
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     facing_right = true
     facing_left = false
@@ -706,6 +719,11 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile17`, function (sprite, location) {
+    if (controller.B.isPressed()) {
+        Level_1()
+    }
+})
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
     if (take_damage == true) {
         info.changeLifeBy(-1)
@@ -763,16 +781,27 @@ function coordinate_values () {
     Player_y = mySprite.y
 }
 function Create_Enemies () {
-    Enemy_slice = sprites.create(assets.image`myImage2`, SpriteKind.Enemy)
-    if (true) {
-        let Slice_Animation: animation.Animation = null
-        animation.attachAnimation(Enemy_slice, Slice_Animation)
-        Slice_Animation.addAnimationFrame(assets.image`myImage2`)
+    sprites.destroy(Enemy_1_Mele)
+    if (Switch_to_Slice == false) {
+        Switch_to_Slice = true
+        Enemy_1_Mele = sprites.create(assets.image`myImage2`, SpriteKind.Enemy)
+        tiles.placeOnTile(Enemy_1_Mele, tiles.getTileLocation(86, 249))
+        Enemy_1_Mele.setScale(1.5, ScaleAnchor.Middle)
+        statusbar = statusbars.create(20, 4, StatusBarKind.Health)
+        statusbar.max = 50
+        statusbar.attachToSprite(Enemy_1_Mele)
+        Slice_Animation_Left = animation.createAnimation(ActionKind.Attacking, 200)
+        animation.attachAnimation(Enemy_1_Mele, Slice_Animation_Left)
+        Slice_Animation_Left.addAnimationFrame(assets.image`myImage4`)
+        Slice_Animation_Left.addAnimationFrame(assets.image`myImage6`)
+        Slice_Animation_Left.addAnimationFrame(assets.image`myImage5`)
+        Slice_right = animation.createAnimation(ActionKind.AttackRight, 200)
+        animation.attachAnimation(Enemy_1_Mele, Slice_right)
+        Slice_right.addAnimationFrame(assets.image`myImage7`)
+        Slice_right.addAnimationFrame(assets.image`myImage9`)
+        Slice_right.addAnimationFrame(assets.image`myImage8`)
     }
 }
-scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleRedCrystal, function (sprite, location) {
-    tiles.placeOnTile(mySprite, Respawn_point)
-})
 function move2 (text: string, num: number) {
     pause(2000)
     mySprite.sayText(text)
@@ -780,7 +809,9 @@ function move2 (text: string, num: number) {
     mySprite.y += 20
     music.play(music.tonePlayable(262, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
 }
-let Enemy_slice: Sprite = null
+let Out_of_range: animation.Animation = null
+let Slice_right: animation.Animation = null
+let Slice_Animation_Left: animation.Animation = null
 let Player_y = 0
 let Player_x = 0
 let enemy_x = 0
@@ -797,6 +828,7 @@ let facing_right = false
 let facing_left = false
 let Facing_up = false
 let Respawn_point: tiles.Location = null
+let Switch_to_Slice = false
 let canDoubleJump = false
 let can_collect_bloodsythe = false
 let Able_to_open_Chest_1 = false
@@ -866,18 +898,31 @@ let On_a_Safe_block = 0
 can_collect_bloodsythe = true
 canDoubleJump = true
 let Can_Slice = false
-Create_Enemies()
-game.onUpdate(function () {
-	
-})
+let My_sprite_is_right = false
+let My_Sprite_is_left = false
+Switch_to_Slice = false
 game.onUpdateInterval(1000, function () {
     take_damage = true
 })
 forever(function () {
 	
 })
-game.onUpdateInterval(500, function () {
-	
+forever(function () {
+    while (Switch_to_Slice == true) {
+        if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
+            if (My_Sprite_is_left == true) {
+                animation.setAction(Enemy_1_Mele, ActionKind.Attacking)
+            } else if (My_sprite_is_right == false) {
+                animation.setAction(Enemy_1_Mele, ActionKind.AttackRight)
+            }
+        }
+        if (!(spriteutils.distanceBetween(mySprite, Enemy_1_Mele) < 50)) {
+            Out_of_range = animation.createAnimation(ActionKind.Idle, 1000)
+            Out_of_range.addAnimationFrame(assets.image`myImage2`)
+            animation.attachAnimation(Enemy_1_Mele, Out_of_range)
+            animation.setAction(Enemy_1_Mele, ActionKind.Idle)
+        }
+    }
 })
 game.onUpdateInterval(100, function () {
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
@@ -889,8 +934,7 @@ game.onUpdateInterval(100, function () {
     if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
         Enemy_1_Mele.follow(mySprite, 50)
     }
-    if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
-        Enemy_slice.follow(mySprite, 50)
-        Can_Slice = true
-    }
+})
+game.onUpdateInterval(200, function () {
+	
 })
