@@ -7,6 +7,9 @@ namespace SpriteKind {
     export const dash = SpriteKind.create()
     export const Upgrade = SpriteKind.create()
 }
+/**
+ * Collecting Item Code
+ */
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile0`, function (sprite, location) {
     if (take_damage == true) {
         info.changeLifeBy(-1)
@@ -519,10 +522,21 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
+/**
+ * Attacks
+ */
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
-    if (Dashing == false) {
-        statusbar.value += -3
-        sprites.destroy(projectile)
+    if (Blood_Sythe_Damage == false) {
+        if (Dashing == false) {
+            statusbar.value += -3
+            sprites.destroy(projectile)
+        }
+    }
+    if (Blood_Sythe_Damage == true) {
+        if (Dashing == false) {
+            statusbar.value += -6
+            sprites.destroy(projectile)
+        }
     }
     Enemy_1_Mele.follow(mySprite, 50)
 })
@@ -699,14 +713,17 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSp
     }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Upgrade, function (sprite, otherSprite) {
-    otherSprite.changeScale(2, ScaleAnchor.Middle)
-    if (controller.A.isPressed()) {
-        sprites.destroy(otherSprite)
-    }
-    if (otherSprite == blood_sythe) {
-        game.showLongText("The Blood Sythe; you feel the power of poor sould resonate within you. You do 6 damage", DialogLayout.Center)
-        sprites.destroy(blood_sythe)
-        Blood_Sythe_Damage = true
+    otherSprite.setScale(2, ScaleAnchor.Middle)
+    if (can_collect_bloodsythe == true) {
+        if (controller.A.isPressed()) {
+            sprites.destroy(otherSprite)
+            if (otherSprite == blood_sythe) {
+                game.showLongText("The Blood Sythe; you feel the power of poor sould resonate within you. You do 6 damage", DialogLayout.Center)
+                sprites.destroy(blood_sythe)
+                Blood_Sythe_Damage = true
+                can_collect_bloodsythe = false
+            }
+        }
     }
 })
 function slow_jump () {
@@ -745,6 +762,39 @@ function coordinate_values () {
     Player_x = mySprite.x
     Player_y = mySprite.y
 }
+function Create_Enemies () {
+    Enemy_slice = sprites.create(assets.image`myImage2`, SpriteKind.Player)
+    Enemy_1_Mele.setScale(1.5, ScaleAnchor.Middle)
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(86, 259))
+    statusbar = statusbars.create(20, 4, StatusBarKind.Health)
+    statusbar.max = 20
+    statusbar.attachToSprite(Enemy_slice)
+    if (Slice_is_Attacking == true) {
+        animation.runImageAnimation(
+        mySprite,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
+        500,
+        false
+        )
+    }
+}
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleRedCrystal, function (sprite, location) {
     tiles.placeOnTile(mySprite, Respawn_point)
 })
@@ -755,6 +805,8 @@ function move2 (text: string, num: number) {
     mySprite.y += 20
     music.play(music.tonePlayable(262, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
 }
+let Slice_is_Attacking = false
+let Enemy_slice: Sprite = null
 let Player_y = 0
 let Player_x = 0
 let enemy_x = 0
@@ -762,15 +814,16 @@ let enemy_y = 0
 let projectile2: Sprite = null
 let direction = 0
 let previous_speed = 0
-let Blood_Sythe_Damage = false
 let blood_sythe: Sprite = null
 let Dashing = false
+let Blood_Sythe_Damage = false
 let A_Button_Press = false
 let projectile: Sprite = null
 let facing_right = false
 let facing_left = false
 let Facing_up = false
 let Respawn_point: tiles.Location = null
+let can_collect_bloodsythe = false
 let Able_to_open_Chest_1 = false
 let take_damage = false
 let statusbar: StatusBarSprite = null
@@ -837,6 +890,7 @@ music.play(music.stringPlayable("C D F D G D - C ", 124), music.PlaybackMode.InB
 take_damage = true
 Able_to_open_Chest_1 = true
 let On_a_Safe_block = 0
+can_collect_bloodsythe = true
 game.onUpdate(function () {
 	
 })
@@ -858,5 +912,9 @@ game.onUpdateInterval(100, function () {
     }
     if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
         Enemy_1_Mele.follow(mySprite, 50)
+    }
+    if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
+        Enemy_slice.follow(mySprite, 50)
+        Slice_is_Attacking = true
     }
 })

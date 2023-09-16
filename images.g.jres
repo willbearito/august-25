@@ -14,15 +14,15 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "myImage0"
     },
-    "image4": {
-        "data": "hwQQABAAAAAQAQAAAAAAABARAAAAAAAAEBEAAPUAAAAAEQH/DwAAAABR///w/w/wAFVVVf//X/URX1VV//D/ABFfVVX/DwAAAFVVVf//AAAAUP8P8P9fAAAQ8f8AAF/1ABEA//UAAAAQEQAAAAAAABARAAAAAAAAEAEAAAAAAAAQAAAAAAAAAA==",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "myImage2"
-    },
     "image5": {
         "data": "hwQQABAAAAAQAQAAAAAAABARAAAAAAAAEBEAAPUAAAAAEQH/DwAAAABR///w/w/wAFVVVf//X/URX1VV//D/ABFfVVX/DwAAAFVVVf//AAAAUP8P8P9fAAAQ8f8AAF/1ABEA//UAAAAQEQAAAAAAABARAAAAAAAAEAEAAAAAAAAQAAAAAAAAAA==",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "myImage3"
+    },
+    "image4": {
+        "data": "hwQQABAAAAAQAQAAAAAAABARAAAAAAAAEBEAADUAAAAAEQH/DwAAAAAx8v/w/w/wACNVVf//X/MRX1VV//AvABFfVVX/DwAAACNVVf//AAAAMPIP8P9fAAAQ8f8AAFLzABEA/zUAAAAQEQAAAAAAABARAAAAAAAAEAEAAAAAAAAQAAAAAAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "myImage2"
     },
     "*": {
         "mimeType": "image/x-mkcd-f4",
