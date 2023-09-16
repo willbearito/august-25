@@ -576,7 +576,9 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sp
 })
 statusbars.onZero(StatusBarKind.Health, function (status) {
     sprites.destroy(status.spriteAttachedTo())
-    Create_Enemies()
+    if (Switch_to_Slice == true) {
+        Create_Enemies()
+    }
 })
 function Level_1 () {
     tiles.setCurrentTilemap(tilemap`level2`)
@@ -781,26 +783,23 @@ function coordinate_values () {
     Player_y = mySprite.y
 }
 function Create_Enemies () {
-    sprites.destroy(Enemy_1_Mele)
-    if (Switch_to_Slice == false) {
-        Switch_to_Slice = true
-        Enemy_1_Mele = sprites.create(assets.image`myImage2`, SpriteKind.Enemy)
-        tiles.placeOnTile(Enemy_1_Mele, tiles.getTileLocation(86, 249))
-        Enemy_1_Mele.setScale(1.5, ScaleAnchor.Middle)
-        statusbar = statusbars.create(20, 4, StatusBarKind.Health)
-        statusbar.max = 50
-        statusbar.attachToSprite(Enemy_1_Mele)
-        Slice_Animation_Left = animation.createAnimation(ActionKind.Attacking, 200)
-        animation.attachAnimation(Enemy_1_Mele, Slice_Animation_Left)
-        Slice_Animation_Left.addAnimationFrame(assets.image`myImage4`)
-        Slice_Animation_Left.addAnimationFrame(assets.image`myImage6`)
-        Slice_Animation_Left.addAnimationFrame(assets.image`myImage5`)
-        Slice_right = animation.createAnimation(ActionKind.AttackRight, 200)
-        animation.attachAnimation(Enemy_1_Mele, Slice_right)
-        Slice_right.addAnimationFrame(assets.image`myImage7`)
-        Slice_right.addAnimationFrame(assets.image`myImage9`)
-        Slice_right.addAnimationFrame(assets.image`myImage8`)
-    }
+    Switch_to_Slice = false
+    Enemy_slice = sprites.create(assets.image`myImage2`, SpriteKind.Enemy)
+    tiles.placeOnTile(Enemy_slice, tiles.getTileLocation(86, 249))
+    Enemy_slice.setScale(1.5, ScaleAnchor.Middle)
+    statusbar = statusbars.create(20, 4, StatusBarKind.Health)
+    Slice_Animation_Left = animation.createAnimation(ActionKind.Attacking, 200)
+    statusbar.attachToSprite(Enemy_slice)
+    animation.attachAnimation(Enemy_slice, Slice_Animation_Left)
+    Slice_Animation_Left.addAnimationFrame(assets.image`myImage4`)
+    Slice_Animation_Left.addAnimationFrame(assets.image`myImage6`)
+    Slice_Animation_Left.addAnimationFrame(assets.image`myImage5`)
+    Slice_right = animation.createAnimation(ActionKind.AttackRight, 200)
+    animation.attachAnimation(Enemy_slice, Slice_right)
+    Slice_right.addAnimationFrame(assets.image`myImage7`)
+    Slice_right.addAnimationFrame(assets.image`myImage9`)
+    Slice_right.addAnimationFrame(assets.image`myImage8`)
+    statusbar.max = 50
 }
 function move2 (text: string, num: number) {
     pause(2000)
@@ -812,6 +811,7 @@ function move2 (text: string, num: number) {
 let Out_of_range: animation.Animation = null
 let Slice_right: animation.Animation = null
 let Slice_Animation_Left: animation.Animation = null
+let Enemy_slice: Sprite = null
 let Player_y = 0
 let Player_x = 0
 let enemy_x = 0
@@ -900,7 +900,7 @@ canDoubleJump = true
 let Can_Slice = false
 let My_sprite_is_right = false
 let My_Sprite_is_left = false
-Switch_to_Slice = false
+Switch_to_Slice = true
 game.onUpdateInterval(1000, function () {
     take_damage = true
 })
@@ -908,19 +908,19 @@ forever(function () {
 	
 })
 forever(function () {
-    while (Switch_to_Slice == true) {
-        if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
+    while (Switch_to_Slice == false) {
+        if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
             if (My_Sprite_is_left == true) {
-                animation.setAction(Enemy_1_Mele, ActionKind.Attacking)
+                animation.setAction(Enemy_slice, ActionKind.Attacking)
             } else if (My_sprite_is_right == false) {
-                animation.setAction(Enemy_1_Mele, ActionKind.AttackRight)
+                animation.setAction(Enemy_slice, ActionKind.AttackRight)
             }
         }
-        if (!(spriteutils.distanceBetween(mySprite, Enemy_1_Mele) < 50)) {
+        if (!(spriteutils.distanceBetween(mySprite, Enemy_slice) < 50)) {
             Out_of_range = animation.createAnimation(ActionKind.Idle, 1000)
             Out_of_range.addAnimationFrame(assets.image`myImage2`)
-            animation.attachAnimation(Enemy_1_Mele, Out_of_range)
-            animation.setAction(Enemy_1_Mele, ActionKind.Idle)
+            animation.attachAnimation(Enemy_slice, Out_of_range)
+            animation.setAction(Enemy_slice, ActionKind.Idle)
         }
     }
 })
