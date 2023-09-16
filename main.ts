@@ -763,36 +763,11 @@ function coordinate_values () {
     Player_y = mySprite.y
 }
 function Create_Enemies () {
-    Enemy_slice = sprites.create(assets.image`myImage2`, SpriteKind.Player)
-    Enemy_1_Mele.setScale(1.5, ScaleAnchor.Middle)
-    tiles.placeOnTile(mySprite, tiles.getTileLocation(86, 259))
-    statusbar = statusbars.create(20, 4, StatusBarKind.Health)
-    statusbar.max = 20
-    statusbar.attachToSprite(Enemy_slice)
-    if (Slice_is_Attacking == true) {
-        animation.runImageAnimation(
-        mySprite,
-        [img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `],
-        500,
-        false
-        )
+    Enemy_slice = sprites.create(assets.image`myImage2`, SpriteKind.Enemy)
+    if (true) {
+        let Slice_Animation: animation.Animation = null
+        animation.attachAnimation(Enemy_slice, Slice_Animation)
+        Slice_Animation.addAnimationFrame(assets.image`myImage2`)
     }
 }
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleRedCrystal, function (sprite, location) {
@@ -805,7 +780,6 @@ function move2 (text: string, num: number) {
     mySprite.y += 20
     music.play(music.tonePlayable(262, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
 }
-let Slice_is_Attacking = false
 let Enemy_slice: Sprite = null
 let Player_y = 0
 let Player_x = 0
@@ -823,13 +797,13 @@ let facing_right = false
 let facing_left = false
 let Facing_up = false
 let Respawn_point: tiles.Location = null
+let canDoubleJump = false
 let can_collect_bloodsythe = false
 let Able_to_open_Chest_1 = false
 let take_damage = false
 let statusbar: StatusBarSprite = null
 let Enemy_1_Mele: Sprite = null
 let mySprite: Sprite = null
-let canDoubleJump = false
 game.setDialogFrame(img`
     . b . . . a b . . . . . b . . 
     a b b b b b b b b b b b 3 b b 
@@ -849,7 +823,6 @@ game.setDialogFrame(img`
     `)
 game.setDialogTextColor(1)
 game.showLongText("You are the reaper of the underworld", DialogLayout.Center)
-canDoubleJump = true
 scene.setBackgroundColor(12)
 tiles.setCurrentTilemap(tilemap`level1`)
 info.setLife(100000)
@@ -891,6 +864,9 @@ take_damage = true
 Able_to_open_Chest_1 = true
 let On_a_Safe_block = 0
 can_collect_bloodsythe = true
+canDoubleJump = true
+let Can_Slice = false
+Create_Enemies()
 game.onUpdate(function () {
 	
 })
@@ -915,6 +891,6 @@ game.onUpdateInterval(100, function () {
     }
     if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
         Enemy_slice.follow(mySprite, 50)
-        Slice_is_Attacking = true
+        Can_Slice = true
     }
 })
