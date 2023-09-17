@@ -181,6 +181,12 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
+controller.combos.attachCombo("udud", function () {
+    Level_1()
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprites.destroy(value)
+    }
+})
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (facing_right == true) {
         projectile = sprites.createProjectileFromSprite(img`
@@ -584,7 +590,10 @@ statusbars.onZero(StatusBarKind.Health, function (status) {
 })
 function Level_1 () {
     tiles.setCurrentTilemap(tilemap`level2`)
-    tiles.placeOnTile(mySprite, tiles.getTileLocation(80, 25))
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 3))
+    tiles.setWallAt(tiles.getTileLocation(13, 13), false)
+    tiles.setWallAt(tiles.getTileLocation(14, 13), false)
+    tiles.setWallAt(tiles.getTileLocation(15, 13), false)
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     facing_right = true
@@ -725,7 +734,9 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile17`, function (sprite, location) {
     if (controller.B.isPressed()) {
-        Level_1()
+        if (spriteutils.isDestroyed(Enemy_slice)) {
+            Level_1()
+        }
     }
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
@@ -733,6 +744,16 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSp
         info.changeLifeBy(-1)
         take_damage = false
     }
+})
+scene.onOverlapTile(SpriteKind.Projectile, assets.tile`myTile7`, function (sprite, location) {
+    sprites.destroy(projectile)
+    tiles.setWallAt(tiles.getTileLocation(15, 13), true)
+    tiles.setWallAt(tiles.getTileLocation(14, 13), true)
+    tiles.setWallAt(tiles.getTileLocation(13, 13), true)
+    tiles.setTileAt(tiles.getTileLocation(13, 13), assets.tile`myTile8`)
+    tiles.setTileAt(tiles.getTileLocation(14, 13), assets.tile`myTile8`)
+    tiles.setTileAt(tiles.getTileLocation(15, 13), assets.tile`myTile8`)
+    tileUtil.coverAllTiles(assets.tile`myTile7`, assets.tile`myTile21`)
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Upgrade, function (sprite, otherSprite) {
     otherSprite.setScale(2, ScaleAnchor.Middle)
