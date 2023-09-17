@@ -525,15 +525,16 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
-/**
- * Attacks
- */
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
     if (Blood_Sythe_Damage == false) {
         if (Dashing == false) {
             sprites.destroy(projectile)
             if (sprite == Enemy_1_Mele) {
                 statusbar.value += -3
+                sprites.destroy(projectile)
+            }
+            if (sprite == Enemy_slice) {
+                Slice_Health_Bar.value += -3
                 sprites.destroy(projectile)
             }
         }
@@ -544,6 +545,10 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
             if (sprite == Enemy_1_Mele) {
                 sprites.destroy(projectile)
                 statusbar.value += -6
+            }
+            if (sprite == Enemy_slice) {
+                sprites.destroy(projectile)
+                Slice_Health_Bar.value += -6
             }
         }
     }
@@ -576,7 +581,6 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sp
 })
 statusbars.onZero(StatusBarKind.Health, function (status) {
     sprites.destroy(status.spriteAttachedTo())
-    Create_Enemies()
 })
 function Level_1 () {
     tiles.setCurrentTilemap(tilemap`level2`)
@@ -780,13 +784,14 @@ function coordinate_values () {
     Player_x = mySprite.x
     Player_y = mySprite.y
 }
+/**
+ * Attacks
+ */
 function Create_Enemies () {
-    sprites.destroy(Enemy_1_Mele)
     if (Switch_to_Slice == false) {
-        Switch_to_Slice = true
         Enemy_slice = sprites.create(assets.image`myImage2`, SpriteKind.Enemy)
-        tiles.placeOnTile(Slice_Health_Bar, tiles.getTileLocation(86, 249))
-        Slice_Health_Bar.setScale(1.5, ScaleAnchor.Middle)
+        tiles.placeOnTile(Enemy_slice, tiles.getTileLocation(86, 249))
+        Enemy_slice.setScale(1.5, ScaleAnchor.Middle)
         Slice_Health_Bar = statusbars.create(20, 4, StatusBarKind.Health)
         Slice_Health_Bar.max = 50
         Slice_Health_Bar.attachToSprite(Enemy_slice)
@@ -800,8 +805,16 @@ function Create_Enemies () {
         Slice_right.addAnimationFrame(assets.image`myImage7`)
         Slice_right.addAnimationFrame(assets.image`myImage9`)
         Slice_right.addAnimationFrame(assets.image`myImage8`)
+        pause(5000)
+        Switch_to_Slice = true
     }
 }
+sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
+    if (sprite == Enemy_1_Mele) {
+        Create_Enemies()
+        sprites.destroy(Enemy_1_Mele)
+    }
+})
 function move2 (text: string, num: number) {
     pause(2000)
     mySprite.sayText(text)
@@ -812,8 +825,6 @@ function move2 (text: string, num: number) {
 let Out_of_range: animation.Animation = null
 let Slice_right: animation.Animation = null
 let Slice_Animation_Left: animation.Animation = null
-let Slice_Health_Bar: StatusBarSprite = null
-let Enemy_slice: Sprite = null
 let Player_y = 0
 let Player_x = 0
 let enemy_x = 0
@@ -822,14 +833,16 @@ let projectile2: Sprite = null
 let direction = 0
 let previous_speed = 0
 let blood_sythe: Sprite = null
+let Slice_Health_Bar: StatusBarSprite = null
+let Enemy_slice: Sprite = null
 let Dashing = false
 let Blood_Sythe_Damage = false
 let A_Button_Press = false
 let projectile: Sprite = null
-let facing_right = false
 let facing_left = false
 let Facing_up = false
 let Respawn_point: tiles.Location = null
+let facing_right = false
 let Switch_to_Slice = false
 let canDoubleJump = false
 let can_collect_bloodsythe = false
@@ -896,25 +909,19 @@ statusbar.attachToSprite(Enemy_1_Mele)
 music.play(music.stringPlayable("C D F D G D - C ", 124), music.PlaybackMode.InBackground)
 take_damage = true
 Able_to_open_Chest_1 = true
-let On_a_Safe_block = 0
 can_collect_bloodsythe = true
 canDoubleJump = true
 let Can_Slice = false
 let My_sprite_is_right = false
 let My_Sprite_is_left = false
 Switch_to_Slice = false
-game.onUpdateInterval(1000, function () {
-    take_damage = true
-})
-forever(function () {
-	
-})
-forever(function () {
-    while (Switch_to_Slice == true) {
+facing_right = true
+game.onUpdateInterval(2000, function () {
+    if (Switch_to_Slice == true) {
         if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
             if (My_Sprite_is_left == true) {
                 animation.setAction(Enemy_slice, ActionKind.Attacking)
-            } else if (My_sprite_is_right == false) {
+            } else if (My_sprite_is_right == true) {
                 animation.setAction(Enemy_slice, ActionKind.AttackRight)
             }
         }
@@ -926,6 +933,15 @@ forever(function () {
         }
     }
 })
+game.onUpdateInterval(1000, function () {
+    take_damage = true
+})
+forever(function () {
+	
+})
+forever(function () {
+	
+})
 game.onUpdateInterval(100, function () {
     if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
         canDoubleJump = true
@@ -935,6 +951,19 @@ game.onUpdateInterval(100, function () {
     }
     if (spriteutils.distanceBetween(mySprite, Enemy_1_Mele) <= 50) {
         Enemy_1_Mele.follow(mySprite, 50)
+    }
+    if (spriteutils.isDestroyed(Enemy_1_Mele)) {
+        if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
+            Enemy_slice.follow(mySprite, 50)
+        }
+        if (mySprite.x - Enemy_slice.x < 0) {
+            My_Sprite_is_left = true
+            My_sprite_is_right = false
+        }
+        if (mySprite.x - Enemy_slice.x > 0) {
+            My_sprite_is_right = true
+            My_Sprite_is_left = false
+        }
     }
 })
 game.onUpdateInterval(200, function () {
