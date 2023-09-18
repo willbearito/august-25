@@ -3,11 +3,16 @@ enum ActionKind {
     Idle,
     Jumping,
     Attacking,
-    AttackRight
+    AttackRight,
+    Life2SliceLeft,
+    Life2sliceright
 }
 namespace SpriteKind {
     export const dash = SpriteKind.create()
     export const Upgrade = SpriteKind.create()
+}
+namespace StatusBarKind {
+    export const SLiceHealth = StatusBarKind.create()
 }
 /**
  * Collecting Item Code
@@ -182,10 +187,17 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     )
 })
 controller.combos.attachCombo("udud", function () {
-    Level_1()
     for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
         sprites.destroy(value)
     }
+    Level_1()
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile6`, function (sprite, location) {
+    sprites.destroy(projectile)
+    tiles.setWallAt(tiles.getTileLocation(26, 2), false)
+    tiles.setWallAt(tiles.getTileLocation(26, 3), false)
+    tiles.setWallAt(tiles.getTileLocation(26, 4), false)
+    tileUtil.coverAllTiles(assets.tile`myTile9`, assets.tile`myTile11`)
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (facing_right == true) {
@@ -540,7 +552,7 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
                 sprites.destroy(projectile)
             }
             if (sprite == Enemy_slice) {
-                Slice_Health_Bar.value += -3
+                Slice_Health_Bar.value += -10
                 sprites.destroy(projectile)
             }
         }
@@ -559,6 +571,16 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
         }
     }
     Enemy_1_Mele.follow(mySprite, 50)
+})
+statusbars.onStatusReached(StatusBarKind.SLiceHealth, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Percentage, 50, function (status) {
+    if (Its_level_1 == true) {
+        if (Slice_phase_2 == false) {
+            Enemy_slice.setImage(assets.image`myImage10`)
+            Enemy_slice.changeScale(1.5, ScaleAnchor.Middle)
+            Slice_phase_2 = true
+            Slice_Health_Bar.value = 80
+        }
+    }
 })
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
     if (Able_to_open_Chest_1 == true) {
@@ -594,6 +616,9 @@ function Level_1 () {
     tiles.setWallAt(tiles.getTileLocation(13, 13), false)
     tiles.setWallAt(tiles.getTileLocation(14, 13), false)
     tiles.setWallAt(tiles.getTileLocation(15, 13), false)
+    Its_level_1 = true
+    Switch_to_Slice = false
+    Create_Enemies()
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     facing_right = true
@@ -811,9 +836,14 @@ function coordinate_values () {
 function Create_Enemies () {
     if (Switch_to_Slice == false) {
         Enemy_slice = sprites.create(assets.image`myImage2`, SpriteKind.Enemy)
-        tiles.placeOnTile(Enemy_slice, tiles.getTileLocation(86, 249))
+        if (Its_level_1 == false) {
+            tiles.placeOnTile(Enemy_slice, tiles.getTileLocation(86, 249))
+        }
+        if (Its_level_1 == true) {
+            tiles.placeOnTile(Enemy_slice, tiles.getTileLocation(46, 14))
+        }
         Enemy_slice.setScale(1.5, ScaleAnchor.Middle)
-        Slice_Health_Bar = statusbars.create(20, 4, StatusBarKind.Health)
+        Slice_Health_Bar = statusbars.create(20, 4, StatusBarKind.SLiceHealth)
         Slice_Health_Bar.max = 50
         Slice_Health_Bar.attachToSprite(Enemy_slice)
         Slice_Animation_Left = animation.createAnimation(ActionKind.Attacking, 200)
@@ -826,6 +856,14 @@ function Create_Enemies () {
         Slice_right.addAnimationFrame(assets.image`myImage7`)
         Slice_right.addAnimationFrame(assets.image`myImage9`)
         Slice_right.addAnimationFrame(assets.image`myImage8`)
+        life_2_slice_left = animation.createAnimation(ActionKind.Life2SliceLeft, 1000)
+        life_2_slice_left.addAnimationFrame(assets.image`myImage11`)
+        life_2_slice_left.addAnimationFrame(assets.image`myImage12`)
+        life_2_slice_left.addAnimationFrame(assets.image`myImage13`)
+        Life_2_slice_right = animation.createAnimation(ActionKind.Life2sliceright, 1000)
+        Life_2_slice_right.addAnimationFrame(assets.image`myImage14`)
+        Life_2_slice_right.addAnimationFrame(assets.image`myImage15`)
+        Life_2_slice_right.addAnimationFrame(assets.image`myImage16`)
         pause(5000)
         Switch_to_Slice = true
     }
@@ -834,6 +872,10 @@ sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
     if (sprite == Enemy_1_Mele) {
         Create_Enemies()
         sprites.destroy(Enemy_1_Mele)
+    }
+    if (sprite == Enemy_slice) {
+        pauseUntil(() => Its_level_1 == true)
+        Create_Enemies()
     }
 })
 function move2 (text: string, num: number) {
@@ -844,6 +886,8 @@ function move2 (text: string, num: number) {
     music.play(music.tonePlayable(262, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
 }
 let Out_of_range: animation.Animation = null
+let Life_2_slice_right: animation.Animation = null
+let life_2_slice_left: animation.Animation = null
 let Slice_right: animation.Animation = null
 let Slice_Animation_Left: animation.Animation = null
 let Player_y = 0
@@ -863,6 +907,8 @@ let projectile: Sprite = null
 let facing_left = false
 let Facing_up = false
 let Respawn_point: tiles.Location = null
+let Slice_phase_2 = false
+let Its_level_1 = false
 let facing_right = false
 let Switch_to_Slice = false
 let canDoubleJump = false
@@ -937,20 +983,41 @@ let My_sprite_is_right = false
 let My_Sprite_is_left = false
 Switch_to_Slice = false
 facing_right = true
+Its_level_1 = false
+Slice_phase_2 = false
 game.onUpdateInterval(2000, function () {
     if (Switch_to_Slice == true) {
-        if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
-            if (My_Sprite_is_left == true) {
-                animation.setAction(Enemy_slice, ActionKind.Attacking)
-            } else if (My_sprite_is_right == true) {
-                animation.setAction(Enemy_slice, ActionKind.AttackRight)
+        if (Slice_phase_2 == false) {
+            if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
+                if (My_Sprite_is_left == true) {
+                    animation.setAction(Enemy_slice, ActionKind.Attacking)
+                } else if (My_sprite_is_right == true) {
+                    animation.setAction(Enemy_slice, ActionKind.AttackRight)
+                }
+            }
+        }
+        if (Slice_phase_2 == true) {
+            if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
+                if (My_Sprite_is_left == true) {
+                    animation.setAction(Enemy_slice, ActionKind.Life2SliceLeft)
+                } else if (My_sprite_is_right == true) {
+                    animation.setAction(Enemy_slice, ActionKind.Life2sliceright)
+                }
             }
         }
         if (!(spriteutils.distanceBetween(mySprite, Enemy_slice) < 50)) {
-            Out_of_range = animation.createAnimation(ActionKind.Idle, 1000)
-            Out_of_range.addAnimationFrame(assets.image`myImage2`)
-            animation.attachAnimation(Enemy_slice, Out_of_range)
-            animation.setAction(Enemy_slice, ActionKind.Idle)
+            if (Slice_phase_2 == true) {
+                Out_of_range = animation.createAnimation(ActionKind.Idle, 1000)
+                Out_of_range.addAnimationFrame(assets.image`myImage2`)
+                animation.attachAnimation(Enemy_slice, Out_of_range)
+                animation.setAction(Enemy_slice, ActionKind.Idle)
+            }
+            if (Slice_phase_2 == true) {
+                Out_of_range = animation.createAnimation(ActionKind.Idle, 1000)
+                Out_of_range.addAnimationFrame(assets.image`myImage10`)
+                animation.attachAnimation(Enemy_slice, Out_of_range)
+                animation.setAction(Enemy_slice, ActionKind.Idle)
+            }
         }
     }
 })
