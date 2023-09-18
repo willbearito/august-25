@@ -577,8 +577,8 @@ statusbars.onStatusReached(StatusBarKind.SLiceHealth, statusbars.StatusCompariso
         if (Slice_phase_2 == false) {
             Enemy_slice.setImage(assets.image`myImage10`)
             Enemy_slice.changeScale(1.5, ScaleAnchor.Middle)
-            Slice_phase_2 = true
             Slice_Health_Bar.value = 80
+            Slice_phase_2 = true
         }
     }
 })
@@ -780,6 +780,9 @@ scene.onOverlapTile(SpriteKind.Projectile, assets.tile`myTile7`, function (sprit
     tiles.setTileAt(tiles.getTileLocation(15, 13), assets.tile`myTile8`)
     tileUtil.coverAllTiles(assets.tile`myTile7`, assets.tile`myTile21`)
 })
+statusbars.onZero(StatusBarKind.SLiceHealth, function (status) {
+    sprites.destroy(status.spriteAttachedTo())
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Upgrade, function (sprite, otherSprite) {
     otherSprite.setScale(2, ScaleAnchor.Middle)
     if (can_collect_bloodsythe == true) {
@@ -856,11 +859,13 @@ function Create_Enemies () {
         Slice_right.addAnimationFrame(assets.image`myImage7`)
         Slice_right.addAnimationFrame(assets.image`myImage9`)
         Slice_right.addAnimationFrame(assets.image`myImage8`)
-        life_2_slice_left = animation.createAnimation(ActionKind.Life2SliceLeft, 1000)
+        life_2_slice_left = animation.createAnimation(ActionKind.Life2SliceLeft, 200)
+        animation.attachAnimation(Enemy_slice, life_2_slice_left)
         life_2_slice_left.addAnimationFrame(assets.image`myImage11`)
         life_2_slice_left.addAnimationFrame(assets.image`myImage12`)
         life_2_slice_left.addAnimationFrame(assets.image`myImage13`)
-        Life_2_slice_right = animation.createAnimation(ActionKind.Life2sliceright, 1000)
+        Life_2_slice_right = animation.createAnimation(ActionKind.Life2sliceright, 200)
+        animation.attachAnimation(Enemy_slice, Life_2_slice_right)
         Life_2_slice_right.addAnimationFrame(assets.image`myImage14`)
         Life_2_slice_right.addAnimationFrame(assets.image`myImage15`)
         Life_2_slice_right.addAnimationFrame(assets.image`myImage16`)
@@ -874,8 +879,7 @@ sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
         sprites.destroy(Enemy_1_Mele)
     }
     if (sprite == Enemy_slice) {
-        pauseUntil(() => Its_level_1 == true)
-        Create_Enemies()
+        sprites.destroy(Enemy_slice)
     }
 })
 function move2 (text: string, num: number) {
@@ -987,26 +991,26 @@ Its_level_1 = false
 Slice_phase_2 = false
 game.onUpdateInterval(2000, function () {
     if (Switch_to_Slice == true) {
-        if (Slice_phase_2 == false) {
-            if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
+        if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
+            if (Slice_phase_2 == false) {
                 if (My_Sprite_is_left == true) {
                     animation.setAction(Enemy_slice, ActionKind.Attacking)
                 } else if (My_sprite_is_right == true) {
                     animation.setAction(Enemy_slice, ActionKind.AttackRight)
                 }
             }
-        }
-        if (Slice_phase_2 == true) {
-            if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
-                if (My_Sprite_is_left == true) {
-                    animation.setAction(Enemy_slice, ActionKind.Life2SliceLeft)
-                } else if (My_sprite_is_right == true) {
-                    animation.setAction(Enemy_slice, ActionKind.Life2sliceright)
+            if (Slice_phase_2 == true) {
+                if (spriteutils.distanceBetween(mySprite, Enemy_slice) <= 50) {
+                    if (My_Sprite_is_left == true) {
+                        animation.setAction(Enemy_slice, ActionKind.Life2SliceLeft)
+                    } else if (My_sprite_is_right == true) {
+                        animation.setAction(Enemy_slice, ActionKind.Life2sliceright)
+                    }
                 }
             }
         }
         if (!(spriteutils.distanceBetween(mySprite, Enemy_slice) < 50)) {
-            if (Slice_phase_2 == true) {
+            if (Slice_phase_2 == false) {
                 Out_of_range = animation.createAnimation(ActionKind.Idle, 1000)
                 Out_of_range.addAnimationFrame(assets.image`myImage2`)
                 animation.attachAnimation(Enemy_slice, Out_of_range)
