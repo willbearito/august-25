@@ -10,9 +10,13 @@ enum ActionKind {
 namespace SpriteKind {
     export const dash = SpriteKind.create()
     export const Upgrade = SpriteKind.create()
+    export const ShadowCloak = SpriteKind.create()
+    export const DeathBall = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const SLiceHealth = StatusBarKind.create()
+    export const BossHealth = StatusBarKind.create()
+    export const BossHealth2 = StatusBarKind.create()
 }
 /**
  * Collecting Item Code
@@ -205,6 +209,50 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile6`, function (sprite, l
     tiles.setWallAt(tiles.getTileLocation(26, 3), false)
     tiles.setWallAt(tiles.getTileLocation(26, 4), false)
     tileUtil.coverAllTiles(assets.tile`myTile9`, assets.tile`myTile11`)
+})
+statusbars.onZero(StatusBarKind.BossHealth, function (status) {
+    sprites.destroy(statusbar.spriteAttachedTo())
+    I_Think_Hes_the_Being_of_Love = sprites.create(img`
+        ................................
+        ................................
+        ................................
+        ...........fffffffff............
+        .........ff222222222ff..........
+        ........f5555222255555f.........
+        .......f555555552555555f........
+        ......f55555555525555555f.......
+        .....f5555555555255555555f......
+        .....f5555555555255555555f......
+        ....f55f55555555555555f555f.....
+        ....f54fff5555555555fff455f.....
+        ....f554ffff555555ffff4555f.....
+        ....f5554f2455555542f45555f.....
+        ....f5555ff55555555ff55555f.....
+        ....f555555555555555555525f.....
+        ....f55555fff5555fff555225f.....
+        ....f55555f11ffff11f555225f.....
+        ....2455555f111111f5552254f.....
+        ....2f555555ff11ff5552255f......
+        ....2245555555ff555552554f......
+        .....2245555555555555554f.......
+        .....22f455555555555554f........
+        .....22.f4455555555544f.........
+        .....22..ff444444444ff..........
+        .....22....fffffffff............
+        .....22.........................
+        .....22.........................
+        ......2.........................
+        ......2.........................
+        ......2.........................
+        ......2.........................
+        `, SpriteKind.Enemy)
+    Phase_2_Boss = statusbars.create(200, 4, StatusBarKind.BossHealth2)
+    tiles.placeOnTile(Phase_2_Boss, tiles.getTileLocation(15, 10))
+    Phase_2_Boss.value = 200
+    Phase_2_Boss.setLabel("I Think He's the Being of Love?")
+    Phase_2_Boss.attachToSprite(I_Think_Hes_the_Being_of_Love)
+    Phase_2_Being_of_Love = true
+    Boss_Phase_1 = false
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (facing_right == true) {
@@ -420,6 +468,29 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     }
     projectile.lifespan = 50
 })
+scene.onOverlapTile(SpriteKind.Projectile, assets.tile`myTile28`, function (sprite, location) {
+    tiles.setWallAt(tiles.getTileLocation(1, 7), false)
+    tiles.setWallAt(tiles.getTileLocation(2, 7), false)
+    tiles.setWallAt(tiles.getTileLocation(3, 7), false)
+    tiles.setWallAt(tiles.getTileLocation(4, 7), false)
+    tiles.setWallAt(tiles.getTileLocation(5, 7), false)
+    tiles.setWallAt(tiles.getTileLocation(6, 7), false)
+    tileUtil.coverAllTiles(assets.tile`myTile8`, sprites.builtin.forestTiles10)
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile15`, function (sprite, location) {
+    if (controller.B.isPressed()) {
+        if (spriteutils.isDestroyed(Enemy_slice)) {
+            Call_Level_2()
+        }
+    }
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile13`, function (sprite, location) {
+    if (controller.B.isPressed()) {
+        if (spriteutils.isDestroyed(Enemy_slice)) {
+            Call_Level_2()
+        }
+    }
+})
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     controller.moveSprite(mySprite, 65, 0)
     A_Button_Press = true
@@ -431,11 +502,9 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         mySprite.ay = 300
         mySprite.vy = -150
         canDoubleJump = false
-    } else if (Wall_Jump) {
-        if (mySprite.isHittingTile(CollisionDirection.Right)) {
-            mySprite.ay = 300
-            mySprite.vy = -150
-        }
+    }
+    if (mySprite.vy == 0) {
+        mySprite.vy = -150
     }
     A_Button_Press = false
 })
@@ -557,7 +626,11 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
+scene.onHitWall(SpriteKind.DeathBall, function (sprite, location) {
+    sprites.destroy(sprite)
+})
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
+    let Invincible_bossy = 0
     if (Blood_Sythe_Damage == false) {
         if (Dashing == false) {
             sprites.destroy(projectile)
@@ -566,8 +639,17 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
                 sprites.destroy(projectile)
             }
             if (sprite == Enemy_slice) {
-                Slice_Health_Bar.value += -10
+                Slice_Health_Bar.value += -3
                 sprites.destroy(projectile)
+            }
+            if (sprite == God) {
+                if (!(Invincible_bossy)) {
+                    sprites.destroy(projectile)
+                    Being_of_Love_statue.value += -3
+                } else if (Invincible_bossy) {
+                    Being_of_Love_statue.value += 0
+                    sprites.destroy(projectile)
+                }
             }
         }
     }
@@ -582,6 +664,16 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
                 sprites.destroy(projectile)
                 Slice_Health_Bar.value += -6
             }
+            if (sprite == God) {
+                if (!(Invincible_bossy)) {
+                    sprites.destroy(projectile)
+                    Being_of_Love_statue.value += -6
+                } else if (Invincible_bossy) {
+                    sprites.destroy(projectile)
+                    Being_of_Love_statue.value += 0
+                }
+                sprites.destroy(projectile)
+            }
         }
     }
     Enemy_1_Mele.follow(mySprite, 50)
@@ -591,6 +683,13 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile18`, function (sprite, 
         if (spriteutils.isDestroyed(Enemy_slice)) {
             Level_1()
         }
+    }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.ShadowCloak, function (sprite, otherSprite) {
+    otherSprite.setScale(2, ScaleAnchor.Middle)
+    if (controller.A.isPressed()) {
+        game.showLongText("This this sheet is woven with the fragile egos and depth of human beings. You are now invincible when you dash", DialogLayout.Center)
+        sprites.destroy(otherSprite)
     }
 })
 statusbars.onStatusReached(StatusBarKind.SLiceHealth, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Percentage, 50, function (status) {
@@ -631,6 +730,19 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sp
 statusbars.onZero(StatusBarKind.Health, function (status) {
     sprites.destroy(status.spriteAttachedTo())
 })
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile16`, function (sprite, location) {
+    if (controller.B.isPressed()) {
+        if (spriteutils.isDestroyed(Enemy_slice)) {
+            Call_Level_2()
+        }
+    }
+})
+controller.combos.attachCombo("uduu", function () {
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprites.destroy(value)
+        Level_3()
+    }
+})
 function Level_1 () {
     tiles.setCurrentTilemap(tilemap`level2`)
     tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 3))
@@ -639,6 +751,25 @@ function Level_1 () {
     tiles.setWallAt(tiles.getTileLocation(15, 13), false)
     Its_level_1 = true
     Switch_to_Slice = false
+    Shadow_Cloak = sprites.create(img`
+        . . . . . . . . b . . . . . . . 
+        . . . . . . b d d c . . . . . . 
+        . . . . . b 1 1 d d c . . . . . 
+        . . . . b 1 1 1 d 1 1 b . . . . 
+        . . . . c 1 1 1 d 1 1 1 c c . . 
+        b b b c d 1 1 c c 1 1 d 1 1 b b 
+        b d 1 1 d d b c c c b d 1 1 1 b 
+        b 1 1 1 1 c c . . c d d 1 1 1 b 
+        b 1 1 1 1 c c . . b 1 1 d d c . 
+        . b 1 1 d d b c b b 1 1 b c c . 
+        . . c b d d b 1 1 b b d b c . . 
+        . . c 1 1 d d 1 1 1 d d d b . . 
+        . b d 1 1 1 d 1 1 d 1 1 1 d b . 
+        . b d 1 1 1 d b b d 1 1 1 1 b . 
+        . . b 1 1 d c c b b d 1 1 d b . 
+        . . b b b b . . . b b b b b b . 
+        `, SpriteKind.ShadowCloak)
+    tiles.placeOnTile(Shadow_Cloak, tiles.getTileLocation(8, 8))
     Create_Enemies()
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile20`, function (sprite, location) {
@@ -927,7 +1058,68 @@ function move2 (text: string, num: number) {
     mySprite.y += 20
     music.play(music.tonePlayable(262, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile14`, function (sprite, location) {
+    if (controller.B.isPressed()) {
+        if (spriteutils.isDestroyed(Enemy_slice)) {
+            Call_Level_2()
+        }
+    }
+})
+function Call_Level_2 () {
+    tiles.setCurrentTilemap(tilemap`level4`)
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(4, 73))
+}
+function Level_3 () {
+    tiles.setCurrentTilemap(tilemap`level5`)
+    God = sprites.create(img`
+        ................................
+        ................................
+        .......................fffffffff
+        .....................ff444444444
+        ....................f55555555555
+        ....................f55555555555
+        ...................f555555555555
+        ...................f555555555555
+        ...................f555555555555
+        ..................f5555555555555
+        ..................f5552f55555555
+        ..................f5552f55555555
+        ..................f555ff55555554
+        ..................f5554455555554
+        ..................f55555555f5554
+        ..................f5555555ff5554
+        ...................f55555ff45554
+        ...................f5555ff455554
+        ...................ffffff4555554
+        ....................f44445555554
+        ....................f44555555554
+        .....................ff444444444
+        .......................fffffffff
+        ........................f4444441
+        ........................f6666fff
+        ........................f6ffffee
+        .......................ffff22222
+        ......................fff2222222
+        .....................ff6f2222222
+        ....................ff66f2222222
+        ...................ff66fe2222222
+        ..................ff666feeeeeeee
+        `, SpriteKind.Enemy)
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 16))
+    tiles.placeOnTile(God, tiles.getTileLocation(28, 15))
+    Being_of_Love_statue = statusbars.create(100, 4, StatusBarKind.BossHealth)
+    Being_of_Love_statue.value = 200
+    Being_of_Love_statue.setLabel("The Being of Love?")
+    Being_of_Love_statue.attachToSprite(God)
+    Boosyy = true
+    Being_of_Love_statue.setOffsetPadding(-100, -50)
+    Boss_Phase_1 = true
+    God.setScale(4, ScaleAnchor.Middle)
+}
+let Wall_Jump = false
 let Out_of_range: animation.Animation = null
+let smiley: Sprite = null
+let Boosyy = false
 let Life_2_slice_right: animation.Animation = null
 let life_2_slice_left: animation.Animation = null
 let Slice_right: animation.Animation = null
@@ -939,14 +1131,20 @@ let enemy_y = 0
 let projectile2: Sprite = null
 let direction = 0
 let previous_speed = 0
+let Shadow_Cloak: Sprite = null
 let blood_sythe: Sprite = null
+let Being_of_Love_statue: StatusBarSprite = null
+let God: Sprite = null
 let Slice_Health_Bar: StatusBarSprite = null
 let Dashing = false
 let Blood_Sythe_Damage = false
 let Move_Left_animation = false
 let Move_Right_Animation = false
-let Wall_Jump = false
 let A_Button_Press = false
+let Boss_Phase_1 = false
+let Phase_2_Being_of_Love = false
+let Phase_2_Boss: StatusBarSprite = null
+let I_Think_Hes_the_Being_of_Love: Sprite = null
 let projectile: Sprite = null
 let facing_left = false
 let Facing_up = false
@@ -1182,32 +1380,35 @@ game.onUpdate(function () {
     }
     if (mySprite.vx < 0 || mySprite.isHittingTile(CollisionDirection.Left)) {
         if (!(Move_Left_animation || Move_Right_Animation)) {
-            mySprite.setImage(img`
-                ........................
-                ........................
-                ........................
-                ........................
-                .........fffff..........
-                ........f11111ff........
-                .......fb111111bf.......
-                .......f1111111dbf......
-                ......fd111111dddf......
-                ......fd11111ddddf......
-                ......fd11dddddddf......
-                ......f111dddddddf......
-                ......f11fcddddddf......
-                .....fb1111bdddbf.......
-                .....f1b1bdfcfff........
-                .....fbfbffffffff.......
-                ......fffffffffff.ff....
-                ...........ffffffff.....
-                ........f1b1bffffff.....
-                ........fbfbffffff......
-                ........................
-                ........................
-                ........................
-                ........................
-                `)
+            mySprite.image.flipX()
+            mySprite.setImage(mySprite.image)
+        }
+    }
+})
+game.onUpdateInterval(700, function () {
+    if (Boosyy == true) {
+        if (Boss_Phase_1 == true) {
+            smiley = sprites.create(img`
+                . . . . . . . . . . . . . . . . 
+                . . . . f f f f f f f . . . . . 
+                . . f f 5 5 5 5 5 5 5 f f . . . 
+                . f 5 5 5 5 5 5 5 5 5 5 5 f . . 
+                . f 5 5 5 5 5 5 5 5 5 5 5 f . . 
+                f 5 5 5 5 5 5 5 5 5 5 5 5 5 f . 
+                f 5 5 5 5 5 5 5 5 5 5 5 5 5 f . 
+                f 5 5 2 5 5 5 5 5 5 5 2 5 5 f . 
+                f 5 5 5 5 5 5 5 5 5 5 5 5 5 f . 
+                f 5 5 5 5 2 5 5 5 2 5 5 5 5 f . 
+                f 5 5 5 5 5 2 2 2 5 5 5 5 5 f . 
+                f 4 5 5 5 5 5 5 5 5 5 5 5 4 f . 
+                . f 4 5 5 5 5 5 5 5 5 5 4 f . . 
+                . f 4 4 5 5 5 5 5 5 5 4 4 f . . 
+                . . f f 4 4 4 4 4 4 4 f f . . . 
+                . . . . f f f f f f f . . . . . 
+                `, SpriteKind.DeathBall)
+            smiley.setStayInScreen(false)
+            tiles.placeOnTile(smiley, tiles.getTileLocation(0, randint(19, 12)))
+            smiley.setVelocity(100, 0)
         }
     }
 })
@@ -1254,6 +1455,12 @@ forever(function () {
 	
 })
 forever(function () {
+	
+})
+forever(function () {
+	
+})
+game.onUpdateInterval(500, function () {
 	
 })
 game.onUpdateInterval(100, function () {
