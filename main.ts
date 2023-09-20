@@ -211,7 +211,7 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile6`, function (sprite, l
     tileUtil.coverAllTiles(assets.tile`myTile9`, assets.tile`myTile11`)
 })
 statusbars.onZero(StatusBarKind.BossHealth, function (status) {
-    sprites.destroy(statusbar.spriteAttachedTo())
+    sprites.destroy(status.spriteAttachedTo())
     I_Think_Hes_the_Being_of_Love = sprites.create(img`
         ................................
         ................................
@@ -1071,40 +1071,7 @@ function Call_Level_2 () {
 }
 function Level_3 () {
     tiles.setCurrentTilemap(tilemap`level5`)
-    God = sprites.create(img`
-        ................................
-        ................................
-        .......................fffffffff
-        .....................ff444444444
-        ....................f55555555555
-        ....................f55555555555
-        ...................f555555555555
-        ...................f555555555555
-        ...................f555555555555
-        ..................f5555555555555
-        ..................f5552f55555555
-        ..................f5552f55555555
-        ..................f555ff55555554
-        ..................f5554455555554
-        ..................f55555555f5554
-        ..................f5555555ff5554
-        ...................f55555ff45554
-        ...................f5555ff455554
-        ...................ffffff4555554
-        ....................f44445555554
-        ....................f44555555554
-        .....................ff444444444
-        .......................fffffffff
-        ........................f4444441
-        ........................f6666fff
-        ........................f6ffffee
-        .......................ffff22222
-        ......................fff2222222
-        .....................ff6f2222222
-        ....................ff66f2222222
-        ...................ff66fe2222222
-        ..................ff666feeeeeeee
-        `, SpriteKind.Enemy)
+    God = sprites.create(assets.image`myImage17`, SpriteKind.Enemy)
     tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 16))
     tiles.placeOnTile(God, tiles.getTileLocation(28, 15))
     Being_of_Love_statue = statusbars.create(100, 4, StatusBarKind.BossHealth)
@@ -1114,7 +1081,7 @@ function Level_3 () {
     Boosyy = true
     Being_of_Love_statue.setOffsetPadding(-100, -50)
     Boss_Phase_1 = true
-    God.setScale(4, ScaleAnchor.Middle)
+    God.setScale(2, ScaleAnchor.Middle)
 }
 let Wall_Jump = false
 let Out_of_range: animation.Animation = null
