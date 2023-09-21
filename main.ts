@@ -31,6 +31,7 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile19`, function (sprite, 
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
             Level_1()
+            game.showLongText("Wow. You did it. ", DialogLayout.Full)
         }
     }
 })
@@ -249,14 +250,13 @@ statusbars.onZero(StatusBarKind.BossHealth, function (status) {
         ......2.........................
         ......2.........................
         `, SpriteKind.Enemy)
-    Phase_2_Boss = statusbars.create(50, 4, StatusBarKind.BossHealth2)
+    Phase_2_Boss = statusbars.create(200, 4, StatusBarKind.BossHealth2)
     tiles.placeOnTile(I_Think_Hes_the_Being_of_Love, tiles.getTileLocation(11, 13))
     Phase_2_Boss.value = 200
     Phase_2_Boss.setLabel("I Think He's the Being of Love?", 1)
     Phase_2_Boss.attachToSprite(I_Think_Hes_the_Being_of_Love)
     Phase_2_Being_of_Love = true
     Boss_Phase_1 = false
-    statusbar.setOffsetPadding(400, 0)
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (facing_right == true) {
@@ -514,13 +514,27 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile15`, function (sprite, 
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
             Call_Level_2()
+            game.showLongText("You have made it through the tutorial, it is time for me to introduce myself. ", DialogLayout.Full)
+            game.showLongText("My Name is Steve. I need you to take out the imposter who stole my clothes, and is posing as me. ", DialogLayout.Full)
+            game.showLongText("Before I forget,You will be sent back here if you fail to defeat him. Good Luck", DialogLayout.Bottom)
         }
     }
+})
+// Collecting Item Code
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile24`, function (sprite, location) {
+    if (take_damage == true) {
+        info.changeLifeBy(-1)
+    }
+    take_damage = false
+    tiles.placeOnTile(mySprite, Respawn_point.getNeighboringLocation(CollisionDirection.Left))
 })
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile13`, function (sprite, location) {
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
             Call_Level_2()
+            game.showLongText("You have made it through the tutorial, it is time for me to introduce myself. ", DialogLayout.Full)
+            game.showLongText("My Name is Steve. I need you to take out the imposter who stole my clothes, and is posing as me. ", DialogLayout.Full)
+            game.showLongText("Before I forget,You will be sent back here if you fail to defeat him. Good Luck", DialogLayout.Bottom)
         }
     }
 })
@@ -544,6 +558,14 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.dash, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
     pause(1000)
+})
+// Collecting Item Code
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile4`, function (sprite, location) {
+    if (take_damage == true) {
+        info.changeLifeBy(-1)
+    }
+    take_damage = false
+    tiles.placeOnTile(mySprite, Respawn_point.getNeighboringLocation(CollisionDirection.Left))
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     facing_right = false
@@ -659,6 +681,14 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
+// Collecting Item Code
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile3`, function (sprite, location) {
+    if (take_damage == true) {
+        info.changeLifeBy(-1)
+    }
+    take_damage = false
+    tiles.placeOnTile(mySprite, Respawn_point.getNeighboringLocation(CollisionDirection.Left))
+})
 scene.onHitWall(SpriteKind.DeathBall, function (sprite, location) {
     sprites.destroy(sprite)
 })
@@ -675,10 +705,6 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
                 Slice_Health_Bar.value += -3
                 sprites.destroy(projectile)
             }
-            if (sprite == I_Think_Hes_the_Being_of_Love) {
-                Phase_2_Boss.value += -3
-                sprites.destroy(projectile)
-            }
             if (sprite == God) {
                 if (!(Invincible_bossy)) {
                     sprites.destroy(projectile)
@@ -693,10 +719,6 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
     if (Blood_Sythe_Damage == true) {
         if (Dashing == false) {
             sprites.destroy(projectile)
-            if (sprite == I_Think_Hes_the_Being_of_Love) {
-                Phase_2_Boss.value += -6
-                sprites.destroy(projectile)
-            }
             if (sprite == Enemy_1_Mele) {
                 sprites.destroy(projectile)
                 statusbar.value += -6
@@ -729,6 +751,7 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile18`, function (sprite, 
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
             Level_1()
+            game.showLongText("Wow. You did it. ", DialogLayout.Full)
         }
     }
 })
@@ -738,9 +761,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.ShadowCloak, function (sprite, o
         game.showLongText("This this sheet is woven with the fragile egos and depth of human beings. You are now invincible when you dash", DialogLayout.Center)
         sprites.destroy(otherSprite)
     }
-})
-scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile29`, function (sprite, location) {
-    Level_3()
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.DeathBall, function (sprite, otherSprite) {
     sprites.destroy(otherSprite)
@@ -792,6 +812,9 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile16`, function (sprite, 
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
             Call_Level_2()
+            game.showLongText("You have made it through the tutorial, it is time for me to introduce myself. ", DialogLayout.Full)
+            game.showLongText("My Name is Steve. I need you to take out the imposter who stole my clothes, and is posing as me. ", DialogLayout.Full)
+            game.showLongText("Before I forget,You will be sent back here if you fail to defeat him. Good Luck", DialogLayout.Bottom)
         }
     }
 })
@@ -805,6 +828,9 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile20`, function (sprite, 
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
             Level_1()
+            game.showLongText("You have made it through the tutorial, it is time for me to introduce myself. ", DialogLayout.Full)
+            game.showLongText("My Name is Steve. I need you to take out the imposter who stole my clothes, and is posing as me. ", DialogLayout.Full)
+            game.showLongText("Before I forget,You will be sent back here if you fail to defeat him. Good Luck", DialogLayout.Bottom)
         }
     }
 })
@@ -998,10 +1024,6 @@ function Create_Enemies () {
 function slow_jump () {
 	
 }
-statusbars.onZero(StatusBarKind.BossHealth2, function (status) {
-    sprites.destroy(Phase_2_Boss.spriteAttachedTo())
-    game.showLongText("You have defeated the false man. The real man thanks you for restoring his name", DialogLayout.Full)
-})
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
     if (take_damage == true) {
         info.changeLifeBy(-1)
@@ -1226,11 +1248,9 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile14`, function (sprite, 
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
             Call_Level_2()
+            game.showLongText("Wow. You did it. ", DialogLayout.Full)
         }
     }
-})
-scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile30`, function (sprite, location) {
-    Level_3()
 })
 let Wall_Jump = false
 let Out_of_range: animation.Animation = null
@@ -1652,7 +1672,6 @@ forever(function () {
         I_Think_Hes_the_Being_of_Love.ax = 100
         pause(2000)
         I_Think_Hes_the_Being_of_Love.ax = -100
-        pause(4000)
     }
 })
 game.onUpdateInterval(500, function () {
