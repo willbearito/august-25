@@ -12,15 +12,14 @@ namespace SpriteKind {
     export const Upgrade = SpriteKind.create()
     export const ShadowCloak = SpriteKind.create()
     export const DeathBall = SpriteKind.create()
+    export const Cross = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const SLiceHealth = StatusBarKind.create()
     export const BossHealth = StatusBarKind.create()
     export const BossHealth2 = StatusBarKind.create()
 }
-/**
- * Collecting Item Code
- */
+// Collecting Item Code
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile0`, function (sprite, location) {
     if (take_damage == true) {
         info.changeLifeBy(-1)
@@ -34,6 +33,10 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile19`, function (sprite, 
             Level_1()
         }
     }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Cross, function (sprite, otherSprite) {
+    sprites.destroy(otherSprite)
+    info.changeLifeBy(-1)
 })
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     Facing_up = true
@@ -247,9 +250,9 @@ statusbars.onZero(StatusBarKind.BossHealth, function (status) {
         ......2.........................
         `, SpriteKind.Enemy)
     Phase_2_Boss = statusbars.create(200, 4, StatusBarKind.BossHealth2)
-    tiles.placeOnTile(Phase_2_Boss, tiles.getTileLocation(15, 10))
+    tiles.placeOnTile(I_Think_Hes_the_Being_of_Love, tiles.getTileLocation(11, 13))
     Phase_2_Boss.value = 200
-    Phase_2_Boss.setLabel("I Think He's the Being of Love?")
+    Phase_2_Boss.setLabel("I Think He's the Being of Love?", 1)
     Phase_2_Boss.attachToSprite(I_Think_Hes_the_Being_of_Love)
     Phase_2_Being_of_Love = true
     Boss_Phase_1 = false
@@ -468,6 +471,35 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     }
     projectile.lifespan = 50
 })
+function Level_1 () {
+    tiles.setCurrentTilemap(tilemap`level2`)
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 3))
+    tiles.setWallAt(tiles.getTileLocation(13, 13), false)
+    tiles.setWallAt(tiles.getTileLocation(14, 13), false)
+    tiles.setWallAt(tiles.getTileLocation(15, 13), false)
+    Its_level_1 = true
+    Switch_to_Slice = false
+    Shadow_Cloak = sprites.create(img`
+        . . . . . . . . b . . . . . . . 
+        . . . . . . b d d c . . . . . . 
+        . . . . . b 1 1 d d c . . . . . 
+        . . . . b 1 1 1 d 1 1 b . . . . 
+        . . . . c 1 1 1 d 1 1 1 c c . . 
+        b b b c d 1 1 c c 1 1 d 1 1 b b 
+        b d 1 1 d d b c c c b d 1 1 1 b 
+        b 1 1 1 1 c c . . c d d 1 1 1 b 
+        b 1 1 1 1 c c . . b 1 1 d d c . 
+        . b 1 1 d d b c b b 1 1 b c c . 
+        . . c b d d b 1 1 b b d b c . . 
+        . . c 1 1 d d 1 1 1 d d d b . . 
+        . b d 1 1 1 d 1 1 d 1 1 1 d b . 
+        . b d 1 1 1 d b b d 1 1 1 1 b . 
+        . . b 1 1 d c c b b d 1 1 d b . 
+        . . b b b b . . . b b b b b b . 
+        `, SpriteKind.ShadowCloak)
+    tiles.placeOnTile(Shadow_Cloak, tiles.getTileLocation(8, 8))
+    Create_Enemies()
+}
 scene.onOverlapTile(SpriteKind.Projectile, assets.tile`myTile28`, function (sprite, location) {
     tiles.setWallAt(tiles.getTileLocation(1, 7), false)
     tiles.setWallAt(tiles.getTileLocation(2, 7), false)
@@ -678,6 +710,12 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
     }
     Enemy_1_Mele.follow(mySprite, 50)
 })
+function coordinate_values () {
+    enemy_y = Enemy_1_Mele.y
+    enemy_x = Enemy_1_Mele.x
+    Player_x = mySprite.x
+    Player_y = mySprite.y
+}
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile18`, function (sprite, location) {
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
@@ -692,6 +730,14 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.ShadowCloak, function (sprite, o
         sprites.destroy(otherSprite)
     }
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.DeathBall, function (sprite, otherSprite) {
+    sprites.destroy(otherSprite)
+    info.changeLifeBy(-1)
+})
+function Call_Level_2 () {
+    tiles.setCurrentTilemap(tilemap`level4`)
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(4, 73))
+}
 statusbars.onStatusReached(StatusBarKind.SLiceHealth, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Percentage, 50, function (status) {
     if (Its_level_1 == true) {
         if (Slice_phase_2 == false) {
@@ -738,40 +784,11 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile16`, function (sprite, 
     }
 })
 controller.combos.attachCombo("uduu", function () {
-    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
-        sprites.destroy(value)
+    for (let value2 of sprites.allOfKind(SpriteKind.Enemy)) {
+        sprites.destroy(value2)
         Level_3()
     }
 })
-function Level_1 () {
-    tiles.setCurrentTilemap(tilemap`level2`)
-    tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 3))
-    tiles.setWallAt(tiles.getTileLocation(13, 13), false)
-    tiles.setWallAt(tiles.getTileLocation(14, 13), false)
-    tiles.setWallAt(tiles.getTileLocation(15, 13), false)
-    Its_level_1 = true
-    Switch_to_Slice = false
-    Shadow_Cloak = sprites.create(img`
-        . . . . . . . . b . . . . . . . 
-        . . . . . . b d d c . . . . . . 
-        . . . . . b 1 1 d d c . . . . . 
-        . . . . b 1 1 1 d 1 1 b . . . . 
-        . . . . c 1 1 1 d 1 1 1 c c . . 
-        b b b c d 1 1 c c 1 1 d 1 1 b b 
-        b d 1 1 d d b c c c b d 1 1 1 b 
-        b 1 1 1 1 c c . . c d d 1 1 1 b 
-        b 1 1 1 1 c c . . b 1 1 d d c . 
-        . b 1 1 d d b c b b 1 1 b c c . 
-        . . c b d d b 1 1 b b d b c . . 
-        . . c 1 1 d d 1 1 1 d d d b . . 
-        . b d 1 1 1 d 1 1 d 1 1 1 d b . 
-        . b d 1 1 1 d b b d 1 1 1 1 b . 
-        . . b 1 1 d c c b b d 1 1 d b . 
-        . . b b b b . . . b b b b b b . 
-        `, SpriteKind.ShadowCloak)
-    tiles.placeOnTile(Shadow_Cloak, tiles.getTileLocation(8, 8))
-    Create_Enemies()
-}
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile20`, function (sprite, location) {
     if (controller.B.isPressed()) {
         if (spriteutils.isDestroyed(Enemy_slice)) {
@@ -925,78 +942,10 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile17`, function (sprite, 
         }
     }
 })
-sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
-    if (take_damage == true) {
-        info.changeLifeBy(-1)
-        take_damage = false
-    }
+scene.onHitWall(SpriteKind.Cross, function (sprite, location) {
+    sprites.destroy(Cross)
 })
-scene.onOverlapTile(SpriteKind.Projectile, assets.tile`myTile7`, function (sprite, location) {
-    sprites.destroy(projectile)
-    tiles.setWallAt(tiles.getTileLocation(15, 13), true)
-    tiles.setWallAt(tiles.getTileLocation(14, 13), true)
-    tiles.setWallAt(tiles.getTileLocation(13, 13), true)
-    tiles.setTileAt(tiles.getTileLocation(13, 13), assets.tile`myTile8`)
-    tiles.setTileAt(tiles.getTileLocation(14, 13), assets.tile`myTile8`)
-    tiles.setTileAt(tiles.getTileLocation(15, 13), assets.tile`myTile8`)
-    tileUtil.coverAllTiles(assets.tile`myTile7`, assets.tile`myTile21`)
-})
-statusbars.onZero(StatusBarKind.SLiceHealth, function (status) {
-    sprites.destroy(status.spriteAttachedTo())
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Upgrade, function (sprite, otherSprite) {
-    otherSprite.setScale(2, ScaleAnchor.Middle)
-    if (can_collect_bloodsythe == true) {
-        if (controller.A.isPressed()) {
-            sprites.destroy(otherSprite)
-            if (otherSprite == blood_sythe) {
-                game.showLongText("The Blood Sythe; you feel the power of poor sould resonate within you. You do 6 damage", DialogLayout.Center)
-                sprites.destroy(blood_sythe)
-                Blood_Sythe_Damage = true
-                can_collect_bloodsythe = false
-            }
-        }
-    }
-})
-function slow_jump () {
-	
-}
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(Dashing)) {
-        Dashing = true
-        previous_speed = mySprite.vx
-        controller.moveSprite(mySprite, 0, 0)
-        if (facing_left == true) {
-            direction = -1
-        } else if (facing_right == true) {
-            direction = 1
-        }
-        mySprite.setVelocity(direction * 400, 0)
-        for (let index = 0; index <= 3; index++) {
-            timer.background(function () {
-                projectile2 = sprites.createProjectileFromSprite(mySprite.image, mySprite, 0 - direction * 5, 0)
-                projectile2.lifespan = 50
-            })
-        }
-        timer.after(100, function () {
-            mySprite.vx = previous_speed
-            controller.moveSprite(mySprite, 150, 0)
-            Dashing = false
-        })
-    }
-})
-scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile5`, function (sprite, location) {
-    Respawn_point = location
-})
-function coordinate_values () {
-    enemy_y = Enemy_1_Mele.y
-    enemy_x = Enemy_1_Mele.x
-    Player_x = mySprite.x
-    Player_y = mySprite.y
-}
-/**
- * Attacks
- */
+// Attacks
 function Create_Enemies () {
     if (Switch_to_Slice == false) {
         Enemy_slice = sprites.create(assets.image`myImage2`, SpriteKind.Enemy)
@@ -1034,6 +983,205 @@ function Create_Enemies () {
         Switch_to_Slice = true
     }
 }
+function slow_jump () {
+	
+}
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
+    if (take_damage == true) {
+        info.changeLifeBy(-1)
+        take_damage = false
+    }
+})
+scene.onOverlapTile(SpriteKind.Projectile, assets.tile`myTile7`, function (sprite, location) {
+    sprites.destroy(projectile)
+    tiles.setWallAt(tiles.getTileLocation(15, 13), true)
+    tiles.setWallAt(tiles.getTileLocation(14, 13), true)
+    tiles.setWallAt(tiles.getTileLocation(13, 13), true)
+    tiles.setTileAt(tiles.getTileLocation(13, 13), assets.tile`myTile8`)
+    tiles.setTileAt(tiles.getTileLocation(14, 13), assets.tile`myTile8`)
+    tiles.setTileAt(tiles.getTileLocation(15, 13), assets.tile`myTile8`)
+    tileUtil.coverAllTiles(assets.tile`myTile7`, assets.tile`myTile21`)
+})
+statusbars.onZero(StatusBarKind.SLiceHealth, function (status) {
+    sprites.destroy(status.spriteAttachedTo())
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Upgrade, function (sprite, otherSprite) {
+    otherSprite.setScale(2, ScaleAnchor.Middle)
+    if (can_collect_bloodsythe == true) {
+        if (controller.A.isPressed()) {
+            sprites.destroy(otherSprite)
+            if (otherSprite == blood_sythe) {
+                game.showLongText("The Blood Sythe; you feel the power of poor sould resonate within you. You do 6 damage", DialogLayout.Center)
+                sprites.destroy(blood_sythe)
+                Blood_Sythe_Damage = true
+                can_collect_bloodsythe = false
+            }
+        }
+    }
+})
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(Dashing)) {
+        Dashing = true
+        previous_speed = mySprite.vx
+        controller.moveSprite(mySprite, 0, 0)
+        if (facing_left == true) {
+            direction = -1
+        } else if (facing_right == true) {
+            direction = 1
+        }
+        for (let index = 0; index <= 3; index++) {
+            timer.background(function () {
+                projectile2 = sprites.createProjectileFromSprite(mySprite.image, mySprite, 0 - direction * 5, 0)
+                projectile2.lifespan = 50
+            })
+        }
+        timer.after(100, function () {
+            mySprite.vx = previous_speed
+            controller.moveSprite(mySprite, 150, 0)
+            Dashing = false
+        })
+        mySprite.setVelocity(direction * 400, 0)
+    }
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile5`, function (sprite, location) {
+    Respawn_point = location
+})
+function Level_3 () {
+    scene.setBackgroundImage(img`
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7776677777777767777777777777777777777777777667777777776777777777777777777777777777766777777777677777777777777777777777777776677777777767777777777777777777777777
+        7666777777777667777777777777777777777767766677777777766777777777777777777777776776667777777776677777777777777777777777677666777777777667777777777777777777777767
+        7767766777667766777766777777777777777766776776677766776677776677777777777777776677677667776677667777667777777777777777667767766777667766777766777777777777777766
+        6666667767766766776766777777777777776676666666776776676677676677777777777777667666666677677667667767667777777777777766766666667767766766776766777777777777776676
+        6666677766766666766667777777777777666677666667776676666676666777777777777766667766666777667666667666677777777777776666776666677766766666766667777777777777666677
+        6666676666666676666677767777776667776667666667666666667666667776777777666777666766666766666666766666777677777766677766676666676666666676666677767777776667776667
+        6666666666666776677666667766677766777666666666666666677667766666776667776677766666666666666667766776666677666777667776666666666666666776677666667766677766777666
+        6666666666666766667766677677667766666666666666666666676666776667767766776666666666666666666667666677666776776677666666666666666666666766667766677677667766666666
+        66b666666666666666666667667776676666666666b666666666666666666667667776676666666666b666666666666666666667667776676666666666b6666666666666666666676677766766666666
+        66b6666666666666666666666b6776666666666666b6666666666666666666666b6776666666666666b6666666666666666666666b6776666666666666b6666666666666666666666b67766666666666
+        66b6666666666666666666666bb676666666666666b6666666666666666666666bb676666666666666b6666666666666666666666bb676666666666666b6666666666666666666666bb6766666666666
+        66b6666666abb66666666ff66bbb66666666666666b6666666fbb66666666ff66bbb66666666666666b6666666fbb66666666ff66bbb66666666666666b6666666fbb66666666ff66bbb666666666666
+        66b666666aadbb666666aaf666bb66666666666666b666666fffbb666666fff666bb66666666666666b666666fffbb666666fff666bb66666666666666b666666fffbb666666fff666bb666666666666
+        6bb666f66aa66bbb6f666aff66bb6666666666666bb666f66ff66bbb6f666aff66bb6666666666666bb666f66ff66bbb6f666aff66bb6666666666666bb666f66ff66bbb6f666aff66bb666666666666
+        6bb666aa66a6dfbbbff66aff66bbb666666666666bb666af66f6dfbbbff66aff66bbb666666666666bb666af66f6dfbbbff66aff66bbb666666666666bb666af66f6dfbbbff66aff66bbb66666666666
+        6bb66aaaaaaaff6bbffaaaf6666bb666666666666bb66aaffffaff6bbffaaaf6666bb666666666666bb66aaffffaff6bbffaaaf6666bb666666666666bb66aaffffaff6bbffaaaf6666bb66666666666
+        bbb666aaaaaaff6bbffaaff66fdbbb66f6666666bbb666affffaff6bbffaaff66fdbbb66f6666666bbb666affffaff6bbffaaff66fdbbb66f6666666bbb666affffaff6bbffaaff66fdbbb66f6666666
+        bbbaa6aaaaaafffbbbfaafffff6bbb66fff66666bbbaa6affffafffbbbfaafffff6bbb66fff66666bbbaa6affffafffbbbfaafffff6bbb66fff66666bbbaa6affffafffbbbfaafffff6bbb66fff66666
+        bbb6aaaaaaaaffffbbfaaffffa6bbbf6ff666666bbb6aaaffffaffffbbfaaffffa6bbbf6ff666666bbb6aaaffffaffffbbfaaffffa6bbbf6ff666666bbb6aaaffffaffffbbfaaffffa6bbbf6ff666666
+        bbb6aaaaaaafffffbbbaaffffafbbbffff66ff66bbb6aaafffafffffbbbaaffffafbbbffff66ff66bbb6aaafffafffffbbbaaffffafbbbffff66ff66bbb6aaafffafffffbbbaaffffafbbbffff66ff66
+        bbbaaaaaaaaffffffbbaaffffafbbbbffffafff6bbbaaaafffaffffffbbaaffffafbbbbffffafff6bbbaaaafffaffffffbbaaffffafbbbbffffafff6bbbaaaafffaffffffbbaaffffafbbbbffffafff6
+        bbfaaaaaaaafffffffbbffffaafbbbbffffaffffbbfaaaaffaafffffffbbffffaafbbbbffffaffffbbfaaaaffaafffffffbbffffaafbbbbffffaffffbbfaaaaffaafffffffbbffffaafbbbbffffaffff
+        bbffaaaaafffffffffbbbfffafffbbbffffaffffbbffaaaaafffffffffbbbfffafffbbbffffaffffbbffaaaaafffffffffbbbfffafffbbbffffaffffbbffaaaaafffffffffbbbfffafffbbbffffaffff
+        bbffaaaaffffffffffabbbbaafffbbbffffafffbbbffaaaaffffffffffabbbbaafffbbbffffafffbbbffaaaaffffffffffabbbbaafffbbbffffafffbbbffaaaaffffffffffabbbbaafffbbbffffafffb
+        bbffaaafffffffffffaabbbbffffbbbbfffafffbbbffaaafffffffffffaabbbbffffbbbbfffafffbbbffaaafffffffffffaabbbbffffbbbbfffafffbbbffaaafffffffffffaabbbbffffbbbbfffafffb
+        bbffaaafffffffffffaabbbbbbffbbbbfffafffbbbffaaafffffffffffaabbbbbbffbbbbfffafffbbbffaaafffffffffffaabbbbbbffbbbbfffafffbbbffaaafffffffffffaabbbbbbffbbbbfffafffb
+        bffffaaffffffffffaaaabbbbbbbbbbbbfffaffbbffffaaffffffffffaaaabbbbbbbbbbbbfffaffbbffffaaffffffffffaaaabbbbbbbbbbbbfffaffbbffffaaffffffffffaaaabbbbbbbbbbbbfffaffb
+        bffffaaafffffffffaafffffbbbbbbbbbfffaffbbffffaaafffffffffaafffffbbbbbbbbbfffaffbbffffaaafffffffffaafffffbbbbbbbbbfffaffbbffffaaafffffffffaafffffbbbbbbbbbfffaffb
+        bffffaaaaffffffffaaffffffbbbbbbbbfffafbbbffffaaaaffffffffaaffffffbbbbbbbbfffafbbbffffaaaaffffffffaaffffffbbbbbbbbfffafbbbffffaaaaffffffffaaffffffbbbbbbbbfffafbb
+        bffffaaaaaffffffaaafffffffbbbbbbbfffabbbbffffaaaaaffffffaaafffffffbbbbbbbfffabbbbffffaaaaaffffffaaafffffffbbbbbbbfffabbbbffffaaaaaffffffaaafffffffbbbbbbbfffabbb
+        aafffffaaaaaffffaaafffffffffbbbbbfffbbbbaafffffaaaaaffffaaafffffffffbbbbbfffbbbbaafffffaaaaaffffaaafffffffffbbbbbfffbbbbaafffffaaaaaffffaaafffffffffbbbbbfffbbbb
+        fafffffaaaaaaafaaaffffffffffbbbbbffbbbbffafffffaaaaaaafaaaffffffffffbbbbbffbbbbffafffffaaaaaaafaaaffffffffffbbbbbffbbbbffafffffaaaaaaafaaaffffffffffbbbbbffbbbbf
+        faffffffaaaaaaaaaaffffffffffbbbbbffbbbfffaffffffaaaaaaaaaaffffffffffbbbbbffbbbfffaffffffaaaaaaaaaaffffffffffbbbbbffbbbfffaffffffaaaaaaaaaaffffffffffbbbbbffbbbff
+        faffffffaaaaaaaaafffffffffffbbbbbffbbffffaffffffaaaaaaaaafffffffffffbbbbbffbbffffaffffffaaaaaaaaafffffffffffbbbbbffbbffffaffffffaaaaaaaaafffffffffffbbbbbffbbfff
+        faafffffaaaaaaafffffffffffffbbbbbffbbafffaafffffaaaaaaafffffffffffffbbbbbffbbafffaafffffaaaaaaafffffffffffffbbbbbffbbafffaafffffaaaaaaafffffffffffffbbbbbffbbaff
+        ffaaffffaaaaaaffffffffffffffbbbbbffbbaffffaaffffaaaaaaffffffffffffffbbbbbffbbaffffaaffffaaaaaaffffffffffffffbbbbbffbbaffffaaffffaaaaaaffffffffffffffbbbbbffbbaff
+        ffaaafffaaaaaaffffffffffffffbbbbbfbbbaafffaaafffaaaaaaffffffffffffffbbbbbfbbbaafffaaafffaaaaaaffffffffffffffbbbbbfbbbaafffaaafffaaaaaaffffffffffffffbbbbbfbbbaaf
+        ffffaaaaaaaaaafffffffffffffbbbbbbfbbbfafffffaaaaaaaaaafffffffffffffbbbbbbfbbbfafffffaaaaaaaaaafffffffffffffbbbbbbfbbbfafffffaaaaaaaaaafffffffffffffbbbbbbfbbbfaf
+        ffffaaaaaaaaaafffffffffffffbbbbbbbbbffafffffaaaaaaaaaafffffffffffffbbbbbbbbbffafffffaaaaaaaaaafffffffffffffbbbbbbbbbffafffffaaaaaaaaaafffffffffffffbbbbbbbbbffaf
+        ffffffaaaaaaaafffffffffffffbbbbbbbbbffaaffffffaaaaaaaafffffffffffffbbbbbbbbbffaaffffffaaaaaaaafffffffffffffbbbbbbbbbffaaffffffaaaaaaaafffffffffffffbbbbbbbbbffaa
+        afffffffaaaaaaffffffffffffbbbbbbbbbffffaafffffffaaaaaaffffffffffffbbbbbbbbbffffaafffffffaaaaaaffffffffffffbbbbbbbbbffffaafffffffaaaaaaffffffffffffbbbbbbbbbffffa
+        aafffffffaaaaaffffffffffffbbbbbbbbbfffffaafffffffaaaaaffffffffffffbbbbbbbbbfffffaafffffffaaaaaffffffffffffbbbbbbbbbfffffaafffffffaaaaaffffffffffffbbbbbbbbbfffff
+        aafffffffaaaaaffffffffffffbbbbbbbbffffffaafffffffaaaaaffffffffffffbbbbbbbbffffffaafffffffaaaaaffffffffffffbbbbbbbbffffffaafffffffaaaaaffffffffffffbbbbbbbbffffff
+        fafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbffffff
+        fafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbffffff
+        fafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbffffff
+        fafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbfffffffafffffffaaaaafffffffffffbbbbbbbbbffffff
+        faaffffffaaaaafffffffffffbbbbbbbbffffffffaaffffffaaaaafffffffffffbbbbbbbbffffffffaaffffffaaaaafffffffffffbbbbbbbbffffffffaaffffffaaaaafffffffffffbbbbbbbbfffffff
+        faaffffffaaaaafffffffffffbbbbbbbbffffffffaaffffffaaaaafffffffffffbbbbbbbbffffffffaaffffffaaaaafffffffffffbbbbbbbbffffffffaaffffffaaaaafffffffffffbbbbbbbbfffffff
+        aaaffffffaaaaafffffffffffbbbbbbbbfffffffaaaffffffaaaaafffffffffffbbbbbbbbfffffffaaaffffffaaaaafffffffffffbbbbbbbbfffffffaaaffffffaaaaafffffffffffbbbbbbbbfffffff
+        aafffffffaaaaafffffffffffbbbbbbbbfffffffaafffffffaaaaafffffffffffbbbbbbbbfffffffaafffffffaaaaafffffffffffbbbbbbbbfffffffaafffffffaaaaafffffffffffbbbbbbbbfffffff
+        aafffffffaaaaaaffffffffffbbbbbbbbfffffffaafffffffaaaaaaffffffffffbbbbbbbbfffffffaafffffffaaaaaaffffffffffbbbbbbbbfffffffaafffffffaaaaaaffffffffffbbbbbbbbfffffff
+        aafffffffaaaaaaffffffffffbbbbbbbbfffffffaafffffffaaaaaaffffffffffbbbbbbbbfffffffaafffffffaaaaaaffffffffffbbbbbbbbfffffffaafffffffaaaaaaffffffffffbbbbbbbbfffffff
+        aafffffffaaaaaaffffffffffbbbbbbbffffffffaafffffffaaaaaaffffffffffbbbbbbbffffffffaafffffffaaaaaaffffffffffbbbbbbbffffffffaafffffffaaaaaaffffffffffbbbbbbbffffffff
+        affffffffaaaaaaffffffffffbbbbbbbfffffffaaffffffffaaaaaaffffffffffbbbbbbbfffffffaaffffffffaaaaaaffffffffffbbbbbbbfffffffaaffffffffaaaaaaffffffffffbbbbbbbfffffffa
+        affffffffaaaaaaffffffffffbbbbbbbffffffaaaffffffffaaaaaaffffffffffbbbbbbbffffffaaaffffffffaaaaaaffffffffffbbbbbbbffffffaaaffffffffaaaaaaffffffffffbbbbbbbffffffaa
+        affffffffaaaaaaffffffffffbbbbbbbffffffaaaffffffffaaaaaaffffffffffbbbbbbbffffffaaaffffffffaaaaaaffffffffffbbbbbbbffffffaaaffffffffaaaaaaffffffffffbbbbbbbffffffaa
+        fffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaa
+        fffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaa
+        fffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaafffffffffaaaaaaafffffffffbbbbbbbfffffaaa
+        fffffffffaaaaaaaaffffffffbbbbbbbffffaaaafffffffffaaaaaaaaffffffffbbbbbbbffffaaaafffffffffaaaaaaaaffffffffbbbbbbbffffaaaafffffffffaaaaaaaaffffffffbbbbbbbffffaaaa
+        fffffffffaaaaaaaaffffffffbbbbbbbffffaaaafffffffffaaaaaaaaffffffffbbbbbbbffffaaaafffffffffaaaaaaaaffffffffbbbbbbbffffaaaafffffffffaaaaaaaaffffffffbbbbbbbffffaaaa
+        fffffffffaaaaaaaaffffffffbbbbbbbffffaaaffffffffffaaaaaaaaffffffffbbbbbbbffffaaaffffffffffaaaaaaaaffffffffbbbbbbbffffaaaffffffffffaaaaaaaaffffffffbbbbbbbffffaaa9
+        ffffffffffaaaaaaaaffffffbbbbbbbbffffaaafffffffffffaaaaaaaaffffffbbbbbbbbffffaaafffffffffffaaaaaaaaffffffbbbbbbbbffffaaafffffffffffaaaaaaaaffffffbbbbbbbbffffaaa9
+        afffffffffaaaaaaaaffffffbbbbbbbbaaaaaaaaafffffffffaaaaaaaaffffffbbbbbbbbaaaaaaaaafffffffffaaaaaaaaffffffbbbbbbbbaaaaaaaaafffffffffaaaaaaaaffffffbbbbbbbbaaaaaaaa
+        aaaaafffffaaaaaaaaffffffbbbbbbbbbaaaaaaaaaaaafffffaaaaaaaaffffffbbbbbbbbbaaaaaaaaaaaafffffaaaaaaaaffffffbbbbbbbbbaaaaaaaaaaaafffffaaaaaaaaffffffbbbbbbbbbaaaaaaa
+        aaaaaaaaffaaaaaaaaafffaabbbbbbbbbaaaaaaaaaaaaaaaffaaaaaaaaafffaabbbbbbbbbaaaaaaaaaaaaaaaffaaaaaaaaafffaabbbbbbbbbaaaaaaaaaaaaaaaffaaaaaaaaafffaabbbbbbbbbaaaaaaa
+        aaaaaaaaaaaaaaaaaaafaaaabbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaafaaaabbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaafaaaabbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaafaaaabbbbbbbbbaaaaaaa
+        aaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbaaaaaa
+        aaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbaaaaaa
+        aaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbaaaaaa
+        aaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaa
+        aaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaa
+        aaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaa
+        aaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbaaaaa
+        aaaaaaaaaaaaaaaaaaa7777777777bbbbbbaaaaaaaaaaaaaaaaaaaaaaaa7777777777bbbbbbaaaaaaaaaaaaaaaaaaaaaaaa7777777777bbbbbbaaaaaaaaaaaaaaaaaaaaaaaa7777777777bbbbbbaaaaa
+        aaaaaaaaaaaaaa77777777777777777777baaaaaaaaaaaaaaaaaaa77777777777777777777baaaaaaaaaaaaaaaaaaa77777777777777777777baaaaaaaaaaaaaaaaaaa77777777777777777777baaaaa
+        aaaaaaaaaaa7777777777777777777777777aaaaaaaaaaaaaaa7777777777777777777777777aaaaaaaaaaaaaaa7777777777777777777777777aaaaaaaaaaaaaaa7777777777777777777777777aaaa
+        aaaaaaaa777777777777777777777777777777aaaaaaaaaa777777777777777777777777777777aaaaaaaaaa777777777777777777777777777777aaaaaaaaaa777777777777777777777777777777aa
+        aaaaa77777777777777777777777777777777777aaaaa77777777777777777777777777777777777aaaaa77777777777777777777777777777777777aaaaa77777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+        `)
+    tiles.setCurrentTilemap(tilemap`level5`)
+    God = sprites.create(assets.image`myImage17`, SpriteKind.Enemy)
+    tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 16))
+    tiles.placeOnTile(God, tiles.getTileLocation(13, 14))
+    Being_of_Love_statue = statusbars.create(100, 4, StatusBarKind.BossHealth)
+    Being_of_Love_statue.value = 200
+    Being_of_Love_statue.setLabel("The Being of Love?")
+    Being_of_Love_statue.attachToSprite(God)
+    Boosyy = true
+    Being_of_Love_statue.setOffsetPadding(-100, -50)
+    Boss_Phase_1 = true
+    God.setScale(2, ScaleAnchor.Middle)
+}
 sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
     if (sprite == Enemy_1_Mele) {
         Create_Enemies()
@@ -1065,41 +1213,25 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile14`, function (sprite, 
         }
     }
 })
-function Call_Level_2 () {
-    tiles.setCurrentTilemap(tilemap`level4`)
-    tiles.placeOnTile(mySprite, tiles.getTileLocation(4, 73))
-}
-function Level_3 () {
-    tiles.setCurrentTilemap(tilemap`level5`)
-    God = sprites.create(assets.image`myImage17`, SpriteKind.Enemy)
-    tiles.placeOnTile(mySprite, tiles.getTileLocation(0, 16))
-    tiles.placeOnTile(God, tiles.getTileLocation(28, 15))
-    Being_of_Love_statue = statusbars.create(100, 4, StatusBarKind.BossHealth)
-    Being_of_Love_statue.value = 200
-    Being_of_Love_statue.setLabel("The Being of Love?")
-    Being_of_Love_statue.attachToSprite(God)
-    Boosyy = true
-    Being_of_Love_statue.setOffsetPadding(-100, -50)
-    Boss_Phase_1 = true
-    God.setScale(2, ScaleAnchor.Middle)
-}
 let Wall_Jump = false
 let Out_of_range: animation.Animation = null
+let My_sprite_is_right = false
+let My_Sprite_is_left = false
 let smiley: Sprite = null
 let Boosyy = false
+let projectile2: Sprite = null
+let direction = 0
+let previous_speed = 0
 let Life_2_slice_right: animation.Animation = null
 let life_2_slice_left: animation.Animation = null
 let Slice_right: animation.Animation = null
 let Slice_Animation_Left: animation.Animation = null
+let Cross: Sprite = null
+let blood_sythe: Sprite = null
 let Player_y = 0
 let Player_x = 0
 let enemy_x = 0
 let enemy_y = 0
-let projectile2: Sprite = null
-let direction = 0
-let previous_speed = 0
-let Shadow_Cloak: Sprite = null
-let blood_sythe: Sprite = null
 let Being_of_Love_statue: StatusBarSprite = null
 let God: Sprite = null
 let Slice_Health_Bar: StatusBarSprite = null
@@ -1108,6 +1240,7 @@ let Blood_Sythe_Damage = false
 let Move_Left_animation = false
 let Move_Right_Animation = false
 let A_Button_Press = false
+let Shadow_Cloak: Sprite = null
 let Boss_Phase_1 = false
 let Phase_2_Being_of_Love = false
 let Phase_2_Boss: StatusBarSprite = null
@@ -1128,6 +1261,7 @@ let take_damage = false
 let statusbar: StatusBarSprite = null
 let Enemy_1_Mele: Sprite = null
 let mySprite: Sprite = null
+let Can_Slice = false
 game.setDialogFrame(img`
     . b . . . a b . . . . . b . . 
     a b b b b b b b b b b b 3 b b 
@@ -1188,9 +1322,6 @@ take_damage = true
 Able_to_open_Chest_1 = true
 can_collect_bloodsythe = true
 canDoubleJump = true
-let Can_Slice = false
-let My_sprite_is_right = false
-let My_Sprite_is_left = false
 Switch_to_Slice = false
 facing_right = true
 Its_level_1 = false
@@ -1416,6 +1547,76 @@ game.onUpdateInterval(2000, function () {
     }
 })
 game.onUpdateInterval(1000, function () {
+    if (Boosyy == true) {
+        if (Phase_2_Being_of_Love == true) {
+            Cross = sprites.create(img`
+                ........................................
+                ........................................
+                ........................................
+                ........................................
+                ........................................
+                ........................................
+                ........................................
+                ........................................
+                ...............eeeee....................
+                ..............eeeeeee...................
+                ..............e4eeeee...................
+                ..............e4eeeee...................
+                ..............e4eeeee...................
+                ..............e4eeeee...................
+                ..............e4eeeee...................
+                ..............e4eeeee...................
+                ..............e4eeeee...................
+                ..............e4eeeee...................
+                ..............e4eeeee...................
+                ..............eeeeeee...................
+                ......eeeeeeeee55555eeeeeeeee...........
+                .....eeeeeeeeee55555eeeeeeeeee..........
+                .....ee55ee2eee52525eee225eeee..........
+                .....e555522eee55555eee522eeee..........
+                .....e55ee25eeee555eee55e2eeee..........
+                .....eeee2255ee55555e55eeeeeee..........
+                ......eeeee55555555555eeeeeee...........
+                ............555555555...................
+                ..............5555555...................
+                ..............e55555e...................
+                ..............e55555e...................
+                ..............e22222e...................
+                ..............e55555e...................
+                ..............e5eee5e...................
+                ..............e5eee5e...................
+                ..............e5eee5e...................
+                ..............e5eee5e...................
+                ..............e5eee5e...................
+                ..............e55555e...................
+                ..............e55eeee...................
+                ..............e5eeeee...................
+                ..............e5eeeee...................
+                ..............e5eeeee...................
+                ..............e5eeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ..............eeeeeee...................
+                ...............eeeee....................
+                ........................................
+                ........................................
+                `, SpriteKind.Cross)
+            tiles.placeOnTile(Cross, tiles.getTileLocation(randint(0, 16), 0))
+            spriteutils.setVelocityAtAngle(Cross, spriteutils.angleFrom(Cross, mySprite), 200)
+        }
+    }
+})
+game.onUpdateInterval(1000, function () {
     take_damage = true
 })
 forever(function () {
@@ -1426,6 +1627,13 @@ forever(function () {
 })
 forever(function () {
 	
+})
+forever(function () {
+    if (Phase_2_Being_of_Love) {
+        I_Think_Hes_the_Being_of_Love.ax = 100
+        pause(2000)
+        I_Think_Hes_the_Being_of_Love.ax = -100
+    }
 })
 game.onUpdateInterval(500, function () {
 	
