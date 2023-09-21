@@ -249,13 +249,14 @@ statusbars.onZero(StatusBarKind.BossHealth, function (status) {
         ......2.........................
         ......2.........................
         `, SpriteKind.Enemy)
-    Phase_2_Boss = statusbars.create(200, 4, StatusBarKind.BossHealth2)
+    Phase_2_Boss = statusbars.create(50, 4, StatusBarKind.BossHealth2)
     tiles.placeOnTile(I_Think_Hes_the_Being_of_Love, tiles.getTileLocation(11, 13))
     Phase_2_Boss.value = 200
     Phase_2_Boss.setLabel("I Think He's the Being of Love?", 1)
     Phase_2_Boss.attachToSprite(I_Think_Hes_the_Being_of_Love)
     Phase_2_Being_of_Love = true
     Boss_Phase_1 = false
+    statusbar.setOffsetPadding(400, 0)
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (facing_right == true) {
@@ -674,6 +675,10 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
                 Slice_Health_Bar.value += -3
                 sprites.destroy(projectile)
             }
+            if (sprite == I_Think_Hes_the_Being_of_Love) {
+                Phase_2_Boss.value += -3
+                sprites.destroy(projectile)
+            }
             if (sprite == God) {
                 if (!(Invincible_bossy)) {
                     sprites.destroy(projectile)
@@ -688,6 +693,10 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
     if (Blood_Sythe_Damage == true) {
         if (Dashing == false) {
             sprites.destroy(projectile)
+            if (sprite == I_Think_Hes_the_Being_of_Love) {
+                Phase_2_Boss.value += -6
+                sprites.destroy(projectile)
+            }
             if (sprite == Enemy_1_Mele) {
                 sprites.destroy(projectile)
                 statusbar.value += -6
@@ -729,6 +738,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.ShadowCloak, function (sprite, o
         game.showLongText("This this sheet is woven with the fragile egos and depth of human beings. You are now invincible when you dash", DialogLayout.Center)
         sprites.destroy(otherSprite)
     }
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile29`, function (sprite, location) {
+    Level_3()
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.DeathBall, function (sprite, otherSprite) {
     sprites.destroy(otherSprite)
@@ -986,6 +998,10 @@ function Create_Enemies () {
 function slow_jump () {
 	
 }
+statusbars.onZero(StatusBarKind.BossHealth2, function (status) {
+    sprites.destroy(Phase_2_Boss.spriteAttachedTo())
+    game.showLongText("You have defeated the false man. The real man thanks you for restoring his name", DialogLayout.Full)
+})
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
     if (take_damage == true) {
         info.changeLifeBy(-1)
@@ -1212,6 +1228,9 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile14`, function (sprite, 
             Call_Level_2()
         }
     }
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile30`, function (sprite, location) {
+    Level_3()
 })
 let Wall_Jump = false
 let Out_of_range: animation.Animation = null
@@ -1633,6 +1652,7 @@ forever(function () {
         I_Think_Hes_the_Being_of_Love.ax = 100
         pause(2000)
         I_Think_Hes_the_Being_of_Love.ax = -100
+        pause(4000)
     }
 })
 game.onUpdateInterval(500, function () {
