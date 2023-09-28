@@ -555,10 +555,6 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     }
     A_Button_Press = false
 })
-sprites.onOverlap(SpriteKind.Enemy, SpriteKind.dash, function (sprite, otherSprite) {
-    info.changeLifeBy(-1)
-    pause(1000)
-})
 // Collecting Item Code
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile4`, function (sprite, location) {
     if (take_damage == true) {
@@ -756,6 +752,7 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile18`, function (sprite, 
     }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.ShadowCloak, function (sprite, otherSprite) {
+    invincible_dash = true
     otherSprite.setScale(2, ScaleAnchor.Middle)
     if (controller.A.isPressed()) {
         game.showLongText("This this sheet is woven with the fragile egos and depth of human beings. You are now invincible when you dash", DialogLayout.Center)
@@ -1025,9 +1022,19 @@ function slow_jump () {
 	
 }
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
-    if (take_damage == true) {
-        info.changeLifeBy(-1)
-        take_damage = false
+    if (Dashing) {
+        if (take_damage == true) {
+            if (invincible_dash == false) {
+                info.changeLifeBy(-1)
+                take_damage = false
+            }
+        }
+    }
+    if (!(Dashing)) {
+        if (take_damage == true) {
+            info.changeLifeBy(-1)
+            take_damage = false
+        }
     }
 })
 scene.onOverlapTile(SpriteKind.Projectile, assets.tile`myTile7`, function (sprite, location) {
@@ -1070,16 +1077,17 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         for (let index = 0; index <= 3; index++) {
             timer.background(function () {
                 projectile2 = sprites.createProjectileFromSprite(mySprite.image, mySprite, 0 - direction * 5, 0)
-                projectile2.lifespan = 50
+                projectile2.lifespan = 75
             })
         }
         timer.after(100, function () {
             mySprite.vx = previous_speed
             controller.moveSprite(mySprite, 150, 0)
-            Dashing = false
         })
         mySprite.setVelocity(direction * 400, 0)
     }
+    pause(750)
+    Dashing = false
 })
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile5`, function (sprite, location) {
     Respawn_point = location
@@ -1252,6 +1260,9 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile14`, function (sprite, 
         }
     }
 })
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile26`, function (sprite, location) {
+    Respawn_point = location
+})
 let Wall_Jump = false
 let Out_of_range: animation.Animation = null
 let My_sprite_is_right = false
@@ -1289,6 +1300,7 @@ let facing_left = false
 let Facing_up = false
 let Enemy_slice: Sprite = null
 let Respawn_point: tiles.Location = null
+let invincible_dash = false
 let Slice_phase_2 = false
 let Its_level_1 = false
 let facing_right = false
@@ -1300,7 +1312,48 @@ let take_damage = false
 let statusbar: StatusBarSprite = null
 let Enemy_1_Mele: Sprite = null
 let mySprite: Sprite = null
+let level_selected = 0
+let Title = sprites.create(img`
+    ...........................................................................
+    ...........................................................................
+    ...........................................................................
+    ......cb...cb.cbbbb.cb....cb....cbbbbb..cbbb...cb...cb.....................
+    ......cb...cb.cbccc.cb....cb....cccbcc.cbbbbb..cb...cb.....................
+    ......cb...cb.cb....cb....cb......cb...cbcccb..cbb..cb.....................
+    ......cb...cb.cb....cb....cb......cb...cb..cb..cbcb.cb.....................
+    ......cb...cb.cb....cb....cb......cb...cb..cb..cb.cbbb.....................
+    ......cbbbbbb.cbbbb.cb....cb......cb...cb..cb..cb..cbb.....................
+    ......cbccccb.cbccc.cb....cb......cb...cb..cb..cb...cb.....................
+    ......cb...cb.cb....cb....cb......cb...cb..cb..cb...cb.....................
+    ......cb...cb.cb....cb....cb......cb...cb..cb..cb...cb.....................
+    ......cb...cb.cb....cb....cb......cb...cb..cb..cb...cb.....................
+    ......cb...cb.cbbbb.cbbbb.cbbbb.cbbbbb.ccbbbc..cb...cb.....................
+    ......cc...cc.ccccc.ccccc.ccccc.cccccc..cccc...cc...cc.....................
+    ...........................................................................
+    `, SpriteKind.Player)
+Title.setScale(2, ScaleAnchor.Middle)
+Title.setPosition(92, 12)
+let Fleisher_Mode = sprites.create(img`
+    .cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc.
+    cc............................................................................cc
+    c...f666666..f6......f666666..f6666666...f66666..f6....f6..f666666...f6666.....c
+    c...f6fffff..f6......f6fffff..ffff6fff..f6fffff..f6....f6..f6fffff..f6ffff6....c
+    c...f6.......f6......f6..........f6.....f6.......f6....f6..f6.......f6....f6...c
+    c...f6.......f6......f6..........f6.....f6.......f6....f6..f6.......f6....f6...c
+    c...f6.......f6......f6..........f6.....f6.......f6....f6..f6.......f6....f6...c
+    c...f6666....f6......f6666.......f6......f6666...f6666666..f6666....f6...f6....c
+    c...f6fff....f6......f6fff.......f6.......ffff6..f6fffff6..f6fff....f66666f....c
+    c...f6.......f6......f6..........f6..........f6..f6....f6..f6.......f6ffff6....c
+    c...f6.......f6......f6..........f6..........f6..f6....f6..f6.......f6....f6...c
+    c...f6.......f6......f6..........f6..........f6..f6....f6..f6.......f6....f6...c
+    c...f6.......f6......f6..........f6..........f6..f6....f6..f6.......f6....f6...c
+    c...f6.......f66666..f666666..f6666666..f66666f..f6....f6..f666666..f6....f6...c
+    cc..ff.......ffffff..fffffff..ffffffff...fffff...ff....ff..fffffff..ff....ff..cc
+    .cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc.
+    `, SpriteKind.Player)
+Fleisher_Mode.setPosition(80, 40)
 let Can_Slice = false
+pauseUntil(() => level_selected == 1)
 game.setDialogFrame(img`
     . b . . . a b . . . . . b . . 
     a b b b b b b b b b b b 3 b b 
@@ -1320,6 +1373,14 @@ game.setDialogFrame(img`
     `)
 game.setDialogTextColor(1)
 game.showLongText("You are the reaper of the underworld", DialogLayout.Center)
+game.showLongText("I have given you a sliver of my power.", DialogLayout.Center)
+game.showLongText("You have been blessed with the ability to jump by pressing the \"a\" button", DialogLayout.Center)
+game.showLongText("You are able to double jump. I have altered the laws of physics such that you can double jump", DialogLayout.Center)
+game.showLongText("I have torn the sinew from Hermes' feet, so you can dash by pressing the down button.", DialogLayout.Center)
+game.showLongText("I hope I don't have to teach you how to walk considering you are not a child ", DialogLayout.Center)
+game.showLongText("If you are a toddler and cannot walk, then go play play Hotwheels and contemplate the meaning of life.", DialogLayout.Center)
+game.showLongText("If you are somehow feeble-minded enough that you cannot figure it out, use the left and right keys.", DialogLayout.Center)
+game.showLongText("You can wall jump, but use that how you like.", DialogLayout.Center)
 scene.setBackgroundColor(12)
 tiles.setCurrentTilemap(tilemap`level1`)
 info.setLife(100000)
@@ -1365,6 +1426,7 @@ Switch_to_Slice = false
 facing_right = true
 Its_level_1 = false
 Slice_phase_2 = false
+invincible_dash = false
 game.onUpdate(function () {
     if (mySprite.vy < 0) {
         if (!(Move_Left_animation || Move_Right_Animation)) {
@@ -1522,6 +1584,9 @@ game.onUpdate(function () {
         }
     }
 })
+game.onUpdate(function () {
+	
+})
 game.onUpdateInterval(700, function () {
     if (Boosyy == true) {
         if (Boss_Phase_1 == true) {
@@ -1656,7 +1721,12 @@ game.onUpdateInterval(1000, function () {
     }
 })
 game.onUpdateInterval(1000, function () {
-    take_damage = true
+    if (Dashing && invincible_dash) {
+        take_damage = false
+    }
+    if (!(Dashing)) {
+        take_damage = true
+    }
 })
 forever(function () {
 	
@@ -1673,6 +1743,9 @@ forever(function () {
         pause(2000)
         I_Think_Hes_the_Being_of_Love.ax = -100
     }
+})
+game.onUpdateInterval(500, function () {
+	
 })
 game.onUpdateInterval(500, function () {
 	
