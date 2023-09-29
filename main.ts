@@ -47,8 +47,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Cross, function (sprite, otherSp
 })
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     if (non_Menu) {
-        music.setVolume(70)
-        music.stopAllSounds()
         Facing_up = true
         facing_left = false
         facing_right = false
@@ -269,8 +267,6 @@ statusbars.onZero(StatusBarKind.BossHealth, function (status) {
     Boss_Phase_1 = false
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    music.stopAllSounds()
-    music.setVolume(70)
     music.play(music.melodyPlayable(music.zapped), music.PlaybackMode.InBackground)
     if (non_Menu) {
         if (facing_right == true) {
@@ -618,8 +614,6 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile13`, function (sprite, 
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (non_Menu) {
-        music.setVolume(70)
-        music.stopAllSounds()
         controller.moveSprite(mySprite, 65, 0)
         A_Button_Press = true
         if (mySprite.isHittingTile(CollisionDirection.Bottom)) {
@@ -647,8 +641,6 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile4`, function (sprite, l
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     if (non_Menu) {
-        music.setVolume(70)
-        music.stopAllSounds()
         facing_right = false
         facing_left = true
         Facing_up = false
@@ -919,8 +911,6 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile20`, function (sprite, 
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     if (non_Menu) {
-        music.setVolume(70)
-        music.stopAllSounds()
         facing_right = true
         facing_left = false
         Facing_up = false
@@ -1115,6 +1105,7 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSp
     if (Dashing) {
         if (take_damage == true) {
             if (invincible_dash == false) {
+                music.play(music.melodyPlayable(music.buzzer), music.PlaybackMode.InBackground)
                 info.changeLifeBy(-1)
                 take_damage = false
             }
@@ -1122,6 +1113,7 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSp
     }
     if (!(Dashing)) {
         if (take_damage == true) {
+            music.play(music.melodyPlayable(music.buzzer), music.PlaybackMode.InBackground)
             info.changeLifeBy(-1)
             take_damage = false
         }
@@ -1156,8 +1148,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Upgrade, function (sprite, other
 })
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (non_Menu) {
-        music.setVolume(70)
-        music.stopAllSounds()
         music.play(music.melodyPlayable(music.spooky), music.PlaybackMode.InBackground)
         if (!(Dashing)) {
             Dashing = true
@@ -1182,6 +1172,9 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         }
         pause(750)
         Dashing = false
+    }
+    if (!(invincible_dash)) {
+        take_damage2 = 0
     }
 })
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile5`, function (sprite, location) {
@@ -1364,6 +1357,7 @@ let My_sprite_is_right = false
 let My_Sprite_is_left = false
 let smiley: Sprite = null
 let Boosyy = false
+let take_damage2 = 0
 let projectile2: Sprite = null
 let direction = 0
 let previous_speed = 0
@@ -1600,7 +1594,7 @@ if (Fleishery) {
     game.showLongText("You Won. There was no challenge. Baby", DialogLayout.Center)
     info.setLife(0)
 }
-music.setVolume(27)
+music.setVolume(40)
 game.onUpdate(function () {
     if (mySprite.vy < 0) {
         if (!(Move_Left_animation || Move_Right_Animation)) {
@@ -1895,12 +1889,7 @@ game.onUpdateInterval(1000, function () {
     }
 })
 game.onUpdateInterval(1000, function () {
-    if (Dashing && invincible_dash) {
-        take_damage = false
-    }
-    if (!(Dashing)) {
-        take_damage = true
-    }
+    take_damage = true
 })
 forever(function () {
 	
@@ -1912,17 +1901,11 @@ forever(function () {
 	
 })
 forever(function () {
-    music.setVolume(27)
     music.play(music.stringPlayable("E B C5 A B G A F ", 124), music.PlaybackMode.UntilDone)
-    music.setVolume(27)
     music.play(music.stringPlayable("E A C5 A B G G F ", 124), music.PlaybackMode.UntilDone)
-    music.setVolume(27)
     music.play(music.stringPlayable("E - E - F A F D ", 124), music.PlaybackMode.UntilDone)
-    music.setVolume(27)
     music.play(music.stringPlayable("E F D G A F E C5 ", 124), music.PlaybackMode.UntilDone)
-    music.setVolume(27)
     music.play(music.stringPlayable("B E A G E F D A ", 124), music.PlaybackMode.UntilDone)
-    music.setVolume(27)
 })
 forever(function () {
     if (Phase_2_Being_of_Love) {
@@ -1978,5 +1961,7 @@ game.onUpdateInterval(100, function () {
     }
 })
 game.onUpdateInterval(200, function () {
-	
+    if (Dashing && invincible_dash) {
+        take_damage = false
+    }
 })
